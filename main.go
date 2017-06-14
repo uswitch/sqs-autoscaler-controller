@@ -2,9 +2,12 @@ package main
 
 import (
 	"context"
+	"os"
+	"os/signal"
 	"time"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/uswitch/k8s-sqs-scaler/pkg/scaler"
 	"github.com/uswitch/k8s-sqs-scaler/pkg/tpr"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
@@ -15,6 +18,12 @@ const (
 )
 
 func main() {
+	// log.SetLevel(log.DebugLevel)
+	stopChan := make(chan os.Signal)
+	signal.Notify(stopChan, os.Interrupt)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	config, err := clientcmd.BuildConfigFromFlags("", kubecfg)
 	c, err := kubernetes.NewForConfig(config)
 	if err != nil {
@@ -31,9 +40,12 @@ func main() {
 		log.Fatalf("Error creating TPR client: %s", err)
 	}
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
 	cache := tpr.NewCache(sc, time.Second*10)
-	cache.Run(ctx)
+	go cache.Run(ctx)
+
+	s := scaler.New(c, cache.Store, time.Second*10)
+	go s.Run(ctx)
+
+	<-stopChan
+	log.Infoln("Stopped.")
 }

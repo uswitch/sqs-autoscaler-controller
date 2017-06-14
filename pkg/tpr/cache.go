@@ -11,7 +11,7 @@ import (
 )
 
 type Cache struct {
-	store      cache.Indexer
+	Store      cache.Indexer
 	controller cache.Controller
 }
 
@@ -24,13 +24,13 @@ func (c Cache) process(obj interface{}) error {
 
 		switch delta.Type {
 		case cache.Sync:
-			c.store.Add(delta.Object)
+			c.Store.Add(delta.Object)
 		case cache.Added:
-			c.store.Add(delta.Object)
+			c.Store.Add(delta.Object)
 		case cache.Updated:
-			c.store.Update(delta.Object)
+			c.Store.Update(delta.Object)
 		case cache.Deleted:
-			c.store.Delete(delta.Object)
+			c.Store.Delete(delta.Object)
 		}
 	}
 	return nil
@@ -45,7 +45,7 @@ func NewCache(client *rest.RESTClient, syncInterval time.Duration) *Cache {
 
 	listWatch := cache.NewListWatchFromClient(client, "sqsautoscalers", "", fields.Everything())
 	store := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
-	c.store = store
+	c.Store = store
 	config := &cache.Config{
 		Queue:            cache.NewDeltaFIFO(cache.MetaNamespaceKeyFunc, nil, store),
 		ListerWatcher:    listWatch,

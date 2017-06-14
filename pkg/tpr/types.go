@@ -15,10 +15,15 @@ type SqsAutoScalerList struct {
 }
 
 type AutoScalerSpec struct {
-	Queue              string `json:"queue"`
-	Deployment         string `json:"deployment"`
-	MinPods            int    `json:"minPods"`
-	MaxPods            int    `josn:"maxPods"`
-	ScaleUpMessages    int    `json:"scaleUpMessages"`
-	ScaleDownMesssages int    `json:"scaleDownMessages"`
+	Queue      string    `json:"queue"`
+	Deployment string    `json:"deployment"`
+	MinPods    int32     `json:"minPods"`
+	MaxPods    int32     `json:"maxPods"`
+	ScaleUp    ScaleSpec `json:"scaleUp"`
+	ScaleDown  ScaleSpec `json:"scaleDown"`
+}
+
+type ScaleSpec struct {
+	Threshold int64 `json:"threshold"`
+	Amount    int32 `json:"amount"`
 }
