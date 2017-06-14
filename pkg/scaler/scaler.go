@@ -8,9 +8,10 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/uswitch/k8s-sqs-scaler/pkg/tpr"
+	"github.com/vmg/backoff"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
 	"k8s.io/client-go/kubernetes"
+	appsv1 "k8s.io/client-go/pkg/apis/apps/v1beta1"
 	"k8s.io/client-go/tools/cache"
 )
 
@@ -77,38 +78,48 @@ func (s Scaler) targetReplicas(size int64, scale *tpr.SqsAutoScaler) (int32, err
 	return replicas, nil
 }
 
-func (s Scaler) executeScale(ctx context.Context, sess *session.Session, scale *tpr.SqsAutoScaler) {
-	logger := log.WithFields(scaleFields(scale))
+func (s Scaler) executeScale(ctx context.Context, sess *session.Session, scale *tpr.SqsAutoScaler) (*appsv1.Deployment, error) {
 	size, err := CurrentQueueSize(sess, scale.Spec.Queue)
 	if err != nil {
-		logger.Errorf("Error checking queue size: %s", err)
-		return
+		return nil, err
 	}
-	logger = logger.WithField("size", size)
-	logger.Infof("checking for scale action")
 
 	replicas, err := s.targetReplicas(size, scale)
 	if err != nil {
-		logger.Errorf("Error checking target replicas: %s", err)
+		return nil, err
 	}
 
-	logger.Infof("Scaling to %d replicas", replicas)
 	deployments := s.client.Apps().Deployments(scale.ObjectMeta.Namespace)
 	d, err := deployments.Get(scale.Spec.Deployment, metav1.GetOptions{})
 	if err != nil {
-		logger.Errorf("error updating deployment: %s", err)
-		return
+		return nil, err
 	}
 	d.Spec.Replicas = &replicas
-	_, err = deployments.Update(d)
-	if err != nil {
-		logger.Errorf("error updating deployment: %s", err)
-	}
+	return deployments.Update(d)
 }
 
 func (s Scaler) do(ctx context.Context, sess *session.Session) {
 	for _, obj := range s.store.List() {
 		scaler := obj.(*tpr.SqsAutoScaler)
-		s.executeScale(ctx, sess, scaler)
+		logger := log.WithFields(scaleFields(scaler))
+		op := func() error {
+			deployment, err := s.executeScale(ctx, sess, scaler)
+			if err != nil {
+				logger.Warnf("unable to perform scale check, will retry: %s", err)
+				return err
+			}
+
+			logger.WithFields(log.Fields{"desired": *deployment.Spec.Replicas, "available": deployment.Status.AvailableReplicas}).Info("Updated deployment")
+			return nil
+		}
+		strategy := backoff.NewExponentialBackOff()
+		strategy.MaxInterval = time.Millisecond * 100
+		strategy.MaxElapsedTime = time.Second * 2
+		strategy.InitialInterval = time.Millisecond * 10
+
+		err := backoff.Retry(op, strategy)
+		if err != nil {
+			logger.Error("unable to perform scale")
+		}
 	}
 }
