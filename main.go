@@ -15,16 +15,12 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-const (
-	kubecfg = "/home/tom/.kube/config"
-)
-
 type options struct {
 	kubeconfig string
 }
 
 func createClient(opts *options) (*kubernetes.Clientset, *rest.Config, error) {
-	config, err := clientcmd.BuildConfigFromFlags("", kubecfg)
+	config, err := clientcmd.BuildConfigFromFlags("", opts.kubeconfig)
 	if err != nil {
 		return nil, nil, err
 	}
