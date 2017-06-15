@@ -16,7 +16,9 @@ import (
 )
 
 type options struct {
-	kubeconfig string
+	kubeconfig    string
+	syncInterval  time.Duration
+	scaleInterval time.Duration
 }
 
 func createClientConfig(opts *options) (*rest.Config, error) {
@@ -42,6 +44,8 @@ func createClient(opts *options) (*kubernetes.Clientset, *rest.Config, error) {
 func main() {
 	opts := &options{}
 	kingpin.Flag("kubeconfig", "Path to kubeconfig.").StringVar(&opts.kubeconfig)
+	kingpin.Flag("sync-interval", "Interval to periodically refresh Scaler objects from Kubernetes.").Default("1m").DurationVar(&opts.syncInterval)
+	kingpin.Flag("scale-interval", "Interval to check queue sizes and scale deployments.").Default("1m").DurationVar(&opts.scaleInterval)
 
 	stopChan := make(chan os.Signal)
 	signal.Notify(stopChan, os.Interrupt)
@@ -63,10 +67,10 @@ func main() {
 		log.Fatalf("Error creating TPR client: %s", err)
 	}
 
-	cache := tpr.NewCache(sc, time.Second*10)
+	cache := tpr.NewCache(sc, opts.syncInterval)
 	go cache.Run(ctx)
 
-	s := scaler.New(c, cache.Store, time.Second*10)
+	s := scaler.New(c, cache.Store, opts.scaleInterval)
 	go s.Run(ctx)
 
 	<-stopChan
