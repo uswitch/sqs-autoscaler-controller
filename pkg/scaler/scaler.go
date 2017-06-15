@@ -7,7 +7,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/uswitch/k8s-sqs-scaler/pkg/tpr"
+	"github.com/uswitch/sqs-autoscaler-controller/pkg/tpr"
 	"github.com/vmg/backoff"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"

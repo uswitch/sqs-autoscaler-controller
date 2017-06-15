@@ -7,8 +7,8 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/uswitch/k8s-sqs-scaler/pkg/scaler"
-	"github.com/uswitch/k8s-sqs-scaler/pkg/tpr"
+	"github.com/uswitch/sqs-autoscaler-controller/pkg/scaler"
+	"github.com/uswitch/sqs-autoscaler-controller/pkg/tpr"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 )

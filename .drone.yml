@@ -1,0 +1,15 @@
+pipeline:
+  build:
+    image: golang:1.8
+    environment:
+      - GOPATH=/drone
+    commands:
+      - go test ./pkg/...
+      - CGO_ENABLED=0 go build -o bin/sqs-autoscaler-controller main.go
+  
+  build:
+    image: plugins/docker
+    repo: registry.usw.co/cloud/sqs-autoscaler-controller
+    tags:
+      - latest
+      - "${DRONE_COMMIT_SHA}"
