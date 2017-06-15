@@ -6,13 +6,15 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/rcrowley/go-metrics"
 	"github.com/uswitch/sqs-autoscaler-controller/pkg/tpr"
 	"github.com/vmg/backoff"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	appsv1 "k8s.io/client-go/pkg/apis/apps/v1beta1"
 	"k8s.io/client-go/tools/cache"
+
+	"github.com/aws/aws-sdk-go/aws/session"
 )
 
 type Scaler struct {
@@ -35,7 +37,8 @@ func (s Scaler) Run(ctx context.Context) error {
 	for {
 		select {
 		case <-ticker.C:
-			s.do(ctx, sess)
+			t := metrics.GetOrRegisterTimer("scaler.do", metrics.DefaultRegistry)
+			t.Time(func() { s.do(ctx, sess) })
 		case <-ctx.Done():
 			return nil
 		}
@@ -60,11 +63,7 @@ func scaleFields(scaler *tpr.SqsAutoScaler) log.Fields {
 	return log.Fields{"name": scaler.ObjectMeta.Name, "namespace": scaler.ObjectMeta.Namespace, "queue": scaler.Spec.Queue, "deploy": scaler.Spec.Deployment}
 }
 
-func (s Scaler) targetReplicas(size int64, scale *tpr.SqsAutoScaler) (int32, error) {
-	d, err := s.client.Apps().Deployments(scale.ObjectMeta.Namespace).Get(scale.Spec.Deployment, metav1.GetOptions{})
-	if err != nil {
-		return 0, err
-	}
+func (s Scaler) targetReplicas(size int64, scale *tpr.SqsAutoScaler, d *appsv1.Deployment) (int32, error) {
 	replicas := d.Status.Replicas
 
 	if size >= scale.Spec.ScaleUp.Threshold {
@@ -83,21 +82,28 @@ func (s Scaler) executeScale(ctx context.Context, sess *session.Session, scale *
 		return nil, 0, err
 	}
 
-	replicas, err := s.targetReplicas(size, scale)
-	if err != nil {
-		return nil, 0, err
-	}
-
 	deployments := s.client.Apps().Deployments(scale.ObjectMeta.Namespace)
 	deployment, err := deployments.Get(scale.Spec.Deployment, metav1.GetOptions{})
 	if err != nil {
 		return nil, 0, err
 	}
 
-	delta := replicas - *deployment.Spec.Replicas
+	if deployment.Status.Replicas != deployment.Status.AvailableReplicas {
+		return nil, 0, fmt.Errorf("deployment available replicas not at target. won't adjust")
+	}
 
+	replicas, err := s.targetReplicas(size, scale, deployment)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	delta := replicas - *deployment.Spec.Replicas
 	deployment.Spec.Replicas = &replicas
 	updated, err := deployments.Update(deployment)
+
+	if delta != 0 && err == nil {
+		metrics.GetOrRegisterMeter("scaler.adjust", metrics.DefaultRegistry).Mark(1)
+	}
 
 	return updated, delta, err
 }
@@ -114,7 +120,7 @@ func (s Scaler) do(ctx context.Context, sess *session.Session) {
 		op := func() error {
 			deployment, delta, err := s.executeScale(ctx, sess, scaler)
 			if err != nil {
-				logger.Warnf("unable to perform scale check, will retry: %s", err)
+				logger.Warnf("unable to perform scale, will retry: %s", err)
 				return err
 			}
 
@@ -125,12 +131,14 @@ func (s Scaler) do(ctx context.Context, sess *session.Session) {
 			return nil
 		}
 		strategy := backoff.NewExponentialBackOff()
-		strategy.MaxInterval = time.Millisecond * 100
-		strategy.MaxElapsedTime = time.Second * 2
-		strategy.InitialInterval = time.Millisecond * 10
+		strategy.MaxInterval = time.Second
+		strategy.MaxElapsedTime = time.Second * 5
+		strategy.InitialInterval = time.Millisecond * 100
 
 		err := backoff.Retry(op, strategy)
 		if err != nil {
+			metrics.GetOrRegisterMeter("scaler.doError", metrics.DefaultRegistry).Mark(1)
+
 			msg := fmt.Sprintf("error scaling: %s", err)
 			logger.Error(msg)
 

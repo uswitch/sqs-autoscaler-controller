@@ -2,23 +2,29 @@ package main
 
 import (
 	"context"
+	"net"
 	"os"
 	"os/signal"
 	"time"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/uswitch/sqs-autoscaler-controller/pkg/scaler"
-	"github.com/uswitch/sqs-autoscaler-controller/pkg/tpr"
+	"github.com/pubnub/go-metrics-statsd"
+	"github.com/rcrowley/go-metrics"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
+
+	"github.com/uswitch/sqs-autoscaler-controller/pkg/scaler"
+	"github.com/uswitch/sqs-autoscaler-controller/pkg/tpr"
 )
 
 type options struct {
-	kubeconfig    string
-	syncInterval  time.Duration
-	scaleInterval time.Duration
+	kubeconfig     string
+	syncInterval   time.Duration
+	scaleInterval  time.Duration
+	statsD         string
+	statsDInterval time.Duration
 }
 
 func createClientConfig(opts *options) (*rest.Config, error) {
@@ -46,12 +52,24 @@ func main() {
 	kingpin.Flag("kubeconfig", "Path to kubeconfig.").StringVar(&opts.kubeconfig)
 	kingpin.Flag("sync-interval", "Interval to periodically refresh Scaler objects from Kubernetes.").Default("1m").DurationVar(&opts.syncInterval)
 	kingpin.Flag("scale-interval", "Interval to check queue sizes and scale deployments.").Default("1m").DurationVar(&opts.scaleInterval)
+
+	kingpin.Flag("statsd", "UDP address to publish StatsD metrics. e.g. 127.0.0.1:8125").Default("").StringVar(&opts.statsD)
+	kingpin.Flag("statsd-interval", "Interval to publish to StatsD").Default("10s").DurationVar(&opts.statsDInterval)
+
 	kingpin.Parse()
 
 	stopChan := make(chan os.Signal)
 	signal.Notify(stopChan, os.Interrupt)
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
+
+	if opts.statsD != "" {
+		addr, err := net.ResolveUDPAddr("udp", opts.statsD)
+		if err != nil {
+			log.Fatal("error parsing statsd address:", err.Error())
+		}
+		go statsd.StatsD(metrics.DefaultRegistry, opts.statsDInterval, "sqs-autoscaler-controller", addr)
+	}
 
 	c, config, err := createClient(opts)
 	if err != nil {
