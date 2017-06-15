@@ -366,6 +366,18 @@
 			"revisionTime": "2017-05-21T17:20:02Z"
 		},
 		{
+			"checksumSHA1": "xiXWXI7iNZ4Vkr/ayWU3KsGnRo0=",
+			"path": "github.com/pubnub/go-metrics-statsd",
+			"revision": "7da61f429d6bdaa79d5d5746998e0db9622c56fc",
+			"revisionTime": "2017-01-24T01:40:03Z"
+		},
+		{
+			"checksumSHA1": "KAzbLjI9MzW2tjfcAsK75lVRp6I=",
+			"path": "github.com/rcrowley/go-metrics",
+			"revision": "1f30fe9094a513ce4c700b9a54458bbb0c96996c",
+			"revisionTime": "2016-11-28T21:05:44Z"
+		},
+		{
 			"checksumSHA1": "5KvHyB1CImtwZT3fwNkNUlc8R0k=",
 			"origin": "k8s.io/apimachinery/vendor/github.com/spf13/pflag",
 			"path": "github.com/spf13/pflag",
