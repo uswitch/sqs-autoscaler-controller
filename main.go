@@ -19,11 +19,19 @@ type options struct {
 	kubeconfig string
 }
 
+func createClientConfig(opts *options) (*rest.Config, error) {
+	if opts.kubeconfig == "" {
+		return rest.InClusterConfig()
+	}
+	return clientcmd.BuildConfigFromFlags("", opts.kubeconfig)
+}
+
 func createClient(opts *options) (*kubernetes.Clientset, *rest.Config, error) {
-	config, err := clientcmd.BuildConfigFromFlags("", opts.kubeconfig)
+	config, err := createClientConfig(opts)
 	if err != nil {
 		return nil, nil, err
 	}
+
 	c, err := kubernetes.NewForConfig(config)
 	if err != nil {
 		return nil, nil, err

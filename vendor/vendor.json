@@ -23,6 +23,24 @@
 			"revisionTime": "2016-12-02T02:35:07Z"
 		},
 		{
+			"checksumSHA1": "KmjnydoAbofMieIWm+it5OWERaM=",
+			"path": "github.com/alecthomas/template",
+			"revision": "a0175ee3bccc567396460bf5acd36800cb10c49c",
+			"revisionTime": "2016-04-05T07:15:01Z"
+		},
+		{
+			"checksumSHA1": "3wt0pTXXeS+S93unwhGoLIyGX/Q=",
+			"path": "github.com/alecthomas/template/parse",
+			"revision": "a0175ee3bccc567396460bf5acd36800cb10c49c",
+			"revisionTime": "2016-04-05T07:15:01Z"
+		},
+		{
+			"checksumSHA1": "fCc3grA7vIxfBru7R3SqjcW+oLI=",
+			"path": "github.com/alecthomas/units",
+			"revision": "2efee857e7cfd4f3d0138cc3cbb1b4966962b93a",
+			"revisionTime": "2015-10-22T06:55:26Z"
+		},
+		{
 			"checksumSHA1": "JtsL9yDNdYfSXQV9IuV/UAF5TuU=",
 			"path": "github.com/aws/aws-sdk-go/aws",
 			"revision": "98b5026c3dac3567123bd27aa193ec541ea5960b",
@@ -478,6 +496,12 @@
 			"path": "golang.org/x/text/width",
 			"revision": "2de00c78cb6d6127fb51b9531c1b3def1cbcac8c",
 			"revisionTime": "2017-05-21T17:20:02Z"
+		},
+		{
+			"checksumSHA1": "QPs8F/aqKAAQJr8dLc3CVQ5SxlM=",
+			"path": "gopkg.in/alecthomas/kingpin.v2",
+			"revision": "8cccfa8eb2e3183254457fb1749b2667fbc364c7",
+			"revisionTime": "2016-02-17T09:03:01Z"
 		},
 		{
 			"checksumSHA1": "pfQwQtWlFezJq0Viroa/L+v+yDM=",
