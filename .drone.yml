@@ -12,4 +12,4 @@ pipeline:
     repo: registry.usw.co/cloud/sqs-autoscaler-controller
     tags:
       - latest
-      - "${DRONE_COMMIT_SHA}"
+      - "${DRONE_COMMIT_SHA:0:8}"
