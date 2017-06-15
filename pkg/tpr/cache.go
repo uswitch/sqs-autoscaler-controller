@@ -5,6 +5,7 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
+	metrics "github.com/rcrowley/go-metrics"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
@@ -55,6 +56,11 @@ func NewCache(client *rest.RESTClient, syncInterval time.Duration) *Cache {
 		Process:          c.process,
 	}
 	c.controller = cache.New(config)
+
+	gauge := metrics.NewFunctionalGauge(func() int64 {
+		return int64(len(store.List()))
+	})
+	metrics.Register("cache.scalers", gauge)
 
 	return c
 }
