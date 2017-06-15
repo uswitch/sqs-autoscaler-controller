@@ -35,7 +35,6 @@ func (s Scaler) Run(ctx context.Context) error {
 	for {
 		select {
 		case <-ticker.C:
-			log.Infof("Tick")
 			s.do(ctx, sess)
 		case <-ctx.Done():
 			return nil
@@ -78,38 +77,51 @@ func (s Scaler) targetReplicas(size int64, scale *tpr.SqsAutoScaler) (int32, err
 	return replicas, nil
 }
 
-func (s Scaler) executeScale(ctx context.Context, sess *session.Session, scale *tpr.SqsAutoScaler) (*appsv1.Deployment, error) {
+func (s Scaler) executeScale(ctx context.Context, sess *session.Session, scale *tpr.SqsAutoScaler) (*appsv1.Deployment, int32, error) {
 	size, err := CurrentQueueSize(sess, scale.Spec.Queue)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	replicas, err := s.targetReplicas(size, scale)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	deployments := s.client.Apps().Deployments(scale.ObjectMeta.Namespace)
-	d, err := deployments.Get(scale.Spec.Deployment, metav1.GetOptions{})
+	deployment, err := deployments.Get(scale.Spec.Deployment, metav1.GetOptions{})
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
-	d.Spec.Replicas = &replicas
-	return deployments.Update(d)
+
+	delta := replicas - *deployment.Spec.Replicas
+
+	deployment.Spec.Replicas = &replicas
+	updated, err := deployments.Update(deployment)
+
+	return updated, delta, err
 }
+
+const (
+	ReasonScaleDeployment       = "ScaleSuccess"
+	ReasonFailedScaleDeployment = "ScaleFail"
+)
 
 func (s Scaler) do(ctx context.Context, sess *session.Session) {
 	for _, obj := range s.store.List() {
 		scaler := obj.(*tpr.SqsAutoScaler)
 		logger := log.WithFields(scaleFields(scaler))
 		op := func() error {
-			deployment, err := s.executeScale(ctx, sess, scaler)
+			deployment, delta, err := s.executeScale(ctx, sess, scaler)
 			if err != nil {
 				logger.Warnf("unable to perform scale check, will retry: %s", err)
 				return err
 			}
 
-			logger.WithFields(log.Fields{"desired": *deployment.Spec.Replicas, "available": deployment.Status.AvailableReplicas}).Info("Updated deployment")
+			logger.WithFields(log.Fields{"delta": delta, "desired": *deployment.Spec.Replicas, "available": deployment.Status.AvailableReplicas}).Info("Updated deployment")
+			if delta != 0 {
+				scaler.RecordEvent(s.client, tpr.TypeNormal, ReasonScaleDeployment, fmt.Sprintf("adjusted deployment to %d (delta: %d)", *deployment.Spec.Replicas, delta))
+			}
 			return nil
 		}
 		strategy := backoff.NewExponentialBackOff()
@@ -119,7 +131,13 @@ func (s Scaler) do(ctx context.Context, sess *session.Session) {
 
 		err := backoff.Retry(op, strategy)
 		if err != nil {
-			logger.Error("unable to perform scale")
+			msg := fmt.Sprintf("error scaling: %s", err)
+			logger.Error(msg)
+
+			err = scaler.RecordEvent(s.client, tpr.TypeWarning, ReasonFailedScaleDeployment, msg)
+			if err != nil {
+				logger.Error("error recording event", err)
+			}
 		}
 	}
 }

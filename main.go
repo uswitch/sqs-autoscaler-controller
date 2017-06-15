@@ -46,6 +46,7 @@ func main() {
 	kingpin.Flag("kubeconfig", "Path to kubeconfig.").StringVar(&opts.kubeconfig)
 	kingpin.Flag("sync-interval", "Interval to periodically refresh Scaler objects from Kubernetes.").Default("1m").DurationVar(&opts.syncInterval)
 	kingpin.Flag("scale-interval", "Interval to check queue sizes and scale deployments.").Default("1m").DurationVar(&opts.scaleInterval)
+	kingpin.Parse()
 
 	stopChan := make(chan os.Signal)
 	signal.Notify(stopChan, os.Interrupt)
