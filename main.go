@@ -20,6 +20,7 @@ import (
 )
 
 type options struct {
+	jsonLog        bool
 	kubeconfig     string
 	syncInterval   time.Duration
 	scaleInterval  time.Duration
@@ -49,6 +50,7 @@ func createClient(opts *options) (*kubernetes.Clientset, *rest.Config, error) {
 
 func main() {
 	opts := &options{}
+	kingpin.Flag("json-log", "Emit logs as JSON").BoolVar(&opts.jsonLog)
 	kingpin.Flag("kubeconfig", "Path to kubeconfig.").StringVar(&opts.kubeconfig)
 	kingpin.Flag("sync-interval", "Interval to periodically refresh Scaler objects from Kubernetes.").Default("1m").DurationVar(&opts.syncInterval)
 	kingpin.Flag("scale-interval", "Interval to check queue sizes and scale deployments.").Default("1m").DurationVar(&opts.scaleInterval)
@@ -57,6 +59,10 @@ func main() {
 	kingpin.Flag("statsd-interval", "Interval to publish to StatsD").Default("10s").DurationVar(&opts.statsDInterval)
 
 	kingpin.Parse()
+
+	if opts.jsonLog {
+		log.SetFormatter(&log.JSONFormatter{})
+	}
 
 	stopChan := make(chan os.Signal)
 	signal.Notify(stopChan, os.Interrupt)
