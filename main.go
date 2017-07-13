@@ -11,12 +11,13 @@ import (
 	"github.com/pubnub/go-metrics-statsd"
 	"github.com/rcrowley/go-metrics"
 	"gopkg.in/alecthomas/kingpin.v2"
+	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 
+	"github.com/uswitch/sqs-autoscaler-controller/pkg/crd"
 	"github.com/uswitch/sqs-autoscaler-controller/pkg/scaler"
-	"github.com/uswitch/sqs-autoscaler-controller/pkg/tpr"
 )
 
 type options struct {
@@ -35,17 +36,20 @@ func createClientConfig(opts *options) (*rest.Config, error) {
 	return clientcmd.BuildConfigFromFlags("", opts.kubeconfig)
 }
 
-func createClient(opts *options) (*kubernetes.Clientset, *rest.Config, error) {
-	config, err := createClientConfig(opts)
-	if err != nil {
-		return nil, nil, err
-	}
-
+func createClient(config *rest.Config) (*kubernetes.Clientset, error) {
 	c, err := kubernetes.NewForConfig(config)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
-	return c, config, nil
+	return c, nil
+}
+
+func createApiExtensionsClient(config *rest.Config) (apiextensionsclient.Interface, error) {
+	c, err := apiextensionsclient.NewForConfig(config)
+	if err != nil {
+		return nil, err
+	}
+	return c, nil
 }
 
 func main() {
@@ -77,25 +81,35 @@ func main() {
 		go statsd.StatsD(metrics.DefaultRegistry, opts.statsDInterval, "sqs-autoscaler-controller", addr)
 	}
 
-	c, config, err := createClient(opts)
+	config, err := createClientConfig(opts)
+	if err != nil {
+		log.Fatalf("error creating client config: %s", err)
+	}
+
+	cs, err := createClient(config)
 	if err != nil {
 		log.Fatalf("error creating client: %s", err)
 	}
 
-	err = tpr.EnsureResource(c)
+	aec, err := createApiExtensionsClient(config)
+	if err != nil {
+		log.Fatalf("error creating apiExtensionsClient: %s", err)
+	}
+
+	err = crd.EnsureResource(aec)
 	if err != nil {
 		log.Fatalf("Error adding resource: %s", err)
 	}
 
-	sc, _, err := tpr.NewClient(config)
+	sc, _, err := crd.NewClient(config)
 	if err != nil {
 		log.Fatalf("Error creating TPR client: %s", err)
 	}
 
-	cache := tpr.NewCache(sc, opts.syncInterval)
+	cache := crd.NewCache(sc, opts.syncInterval)
 	go cache.Run(ctx)
 
-	s := scaler.New(c, cache.Store, opts.scaleInterval)
+	s := scaler.New(cs, cache.Store, opts.scaleInterval)
 	go s.Run(ctx)
 
 	<-stopChan

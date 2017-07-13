@@ -7,11 +7,11 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/rcrowley/go-metrics"
-	"github.com/uswitch/sqs-autoscaler-controller/pkg/tpr"
+	"github.com/uswitch/sqs-autoscaler-controller/pkg/crd"
 	"github.com/vmg/backoff"
+	appsv1 "k8s.io/api/apps/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
-	appsv1 "k8s.io/client-go/pkg/apis/apps/v1beta1"
 	"k8s.io/client-go/tools/cache"
 
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -59,11 +59,11 @@ func max(a, b int32) int32 {
 	return b
 }
 
-func scaleFields(scaler *tpr.SqsAutoScaler) log.Fields {
+func scaleFields(scaler *crd.SqsAutoScaler) log.Fields {
 	return log.Fields{"name": scaler.ObjectMeta.Name, "namespace": scaler.ObjectMeta.Namespace, "queue": scaler.Spec.Queue, "deploy": scaler.Spec.Deployment}
 }
 
-func (s Scaler) targetReplicas(size int64, scale *tpr.SqsAutoScaler, d *appsv1.Deployment) (int32, error) {
+func (s Scaler) targetReplicas(size int64, scale *crd.SqsAutoScaler, d *appsv1.Deployment) (int32, error) {
 	replicas := d.Status.Replicas
 
 	if size >= scale.Spec.ScaleUp.Threshold {
@@ -76,7 +76,7 @@ func (s Scaler) targetReplicas(size int64, scale *tpr.SqsAutoScaler, d *appsv1.D
 	return replicas, nil
 }
 
-func (s Scaler) executeScale(ctx context.Context, sess *session.Session, scale *tpr.SqsAutoScaler) (*appsv1.Deployment, int32, error) {
+func (s Scaler) executeScale(ctx context.Context, sess *session.Session, scale *crd.SqsAutoScaler) (*appsv1.Deployment, int32, error) {
 	size, err := CurrentQueueSize(sess, scale.Spec.Queue)
 	if err != nil {
 		return nil, 0, err
@@ -115,7 +115,7 @@ const (
 
 func (s Scaler) do(ctx context.Context, sess *session.Session) {
 	for _, obj := range s.store.List() {
-		scaler := obj.(*tpr.SqsAutoScaler)
+		scaler := obj.(*crd.SqsAutoScaler)
 		logger := log.WithFields(scaleFields(scaler))
 		op := func() error {
 			deployment, delta, err := s.executeScale(ctx, sess, scaler)
@@ -126,7 +126,7 @@ func (s Scaler) do(ctx context.Context, sess *session.Session) {
 
 			logger.WithFields(log.Fields{"delta": delta, "desired": *deployment.Spec.Replicas, "available": deployment.Status.AvailableReplicas}).Info("Updated deployment")
 			if delta != 0 {
-				scaler.RecordEvent(s.client, tpr.TypeNormal, ReasonScaleDeployment, fmt.Sprintf("adjusted deployment to %d (delta: %d)", *deployment.Spec.Replicas, delta))
+				scaler.RecordEvent(s.client, crd.TypeNormal, ReasonScaleDeployment, fmt.Sprintf("adjusted deployment to %d (delta: %d)", *deployment.Spec.Replicas, delta))
 			}
 			return nil
 		}
@@ -142,7 +142,7 @@ func (s Scaler) do(ctx context.Context, sess *session.Session) {
 			msg := fmt.Sprintf("error scaling: %s", err)
 			logger.Error(msg)
 
-			err = scaler.RecordEvent(s.client, tpr.TypeWarning, ReasonFailedScaleDeployment, msg)
+			err = scaler.RecordEvent(s.client, crd.TypeWarning, ReasonFailedScaleDeployment, msg)
 			if err != nil {
 				logger.Error("error recording event", err)
 			}

@@ -14,7 +14,7 @@ spec:
   deployment: testapp
   maxPods: 20
   minPods: 1
-  queue: https://sqs.eu-west-1.amazonaws.com/136393635417/some-queue
+  queue: https://sqs.eu-west-1.amazonaws.com/1234567890/some-queue
   scaleDown:
     amount: 2
     threshold: 10

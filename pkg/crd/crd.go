@@ -1,27 +1,36 @@
-package tpr
+package crd
 
 import (
+	"reflect"
+
+	apiextensionsv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
+	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	// metav1 "k8s.io/apiextensions-apiserver/vendor/k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/pkg/apis/extensions/v1beta1"
 	"k8s.io/client-go/rest"
 )
 
-func EnsureResource(client *kubernetes.Clientset) error {
-	tpr := &v1beta1.ThirdPartyResource{
+func EnsureResource(client apiextensionsclient.Interface) error {
+	crd := &apiextensionsv1beta1.CustomResourceDefinition{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: "sqs-auto-scaler.aws.uswitch.com",
+			Name: "sqsautoscalers.aws.uswitch.com",
 		},
-		Versions: []v1beta1.APIVersion{
-			{Name: Version},
+		Spec: apiextensionsv1beta1.CustomResourceDefinitionSpec{
+			Group:   "aws.uswitch.com",
+			Version: "v1",
+			Scope:   apiextensionsv1beta1.NamespaceScoped,
+			Names: apiextensionsv1beta1.CustomResourceDefinitionNames{
+				Singular: "sqsautoscaler",
+				Plural:   "sqsautoscalers",
+				Kind:     reflect.TypeOf(SqsAutoScaler{}).Name(),
+			},
 		},
-		Description: "Deployment Autoscaler based on SQS queue length",
 	}
-	_, err := client.ExtensionsV1beta1().ThirdPartyResources().Create(tpr)
+	_, err := client.ApiextensionsV1beta1().CustomResourceDefinitions().Create(crd)
 	if err != nil && apierrors.IsAlreadyExists(err) {
 		return nil
 	}
