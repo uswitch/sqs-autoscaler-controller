@@ -17,3 +17,13 @@ pipeline:
     tags:
       - ${DRONE_COMMIT_BRANCH}
       - ${DRONE_COMMIT_SHA:0:8}
+
+  docker-tagged:
+    when:
+      event: tag
+    image: plugins/docker
+    registry: quay.io
+    repo: quay.io/uswitch/sqs-autoscaler-controller
+    secrets: [ docker_username, docker_password ]
+    tags:
+      - ${DRONE_TAG}
