@@ -15,5 +15,5 @@ pipeline:
     repo: quay.io/uswitch/sqs-autoscaler-controller
     secrets: [ docker_username, docker_password ]
     tags:
-      - {DRONE_COMMIT_BRANCH}
-      - "${DRONE_COMMIT_SHA:0:8}"
+      - ${DRONE_COMMIT_BRANCH}
+      - ${DRONE_COMMIT_SHA:0:8}
