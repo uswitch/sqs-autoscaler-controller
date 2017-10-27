@@ -6,10 +6,14 @@ pipeline:
     commands:
       - go test ./pkg/...
       - CGO_ENABLED=0 go build -o bin/sqs-autoscaler-controller main.go
-  
+
   build:
+    when:
+      event: push
     image: plugins/docker
-    repo: registry.usw.co/cloud/sqs-autoscaler-controller
+    registry: quay.io
+    repo: quay.io/uswitch/sqs-autoscaler-controller
+    secrets: [ docker_username, docker_password ]
     tags:
-      - latest
+      - {DRONE_COMMIT_BRANCH}
       - "${DRONE_COMMIT_SHA:0:8}"
