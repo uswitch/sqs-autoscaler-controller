@@ -17,7 +17,7 @@ spec:
           hostPath:
             path: /usr/share/ca-certificates
       containers:
-      - image: quay.io/uswitch/sqs-autoscaler-controller:latest
+      - image: quay.io/uswitch/sqs-autoscaler-controller:master
         imagePullPolicy: Always
         env:
         - name: AWS_REGION
