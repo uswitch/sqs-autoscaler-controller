@@ -15,7 +15,7 @@ spec:
       volumes:
         - name: ssl-certs
           hostPath:
-            path: /usr/share/ca-certificates
+            path: /etc/ssl/certs
       containers:
       - image: quay.io/uswitch/sqs-autoscaler-controller:master
         imagePullPolicy: Always
