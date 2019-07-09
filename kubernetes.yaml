@@ -12,6 +12,7 @@ spec:
       annotations:
         iam.amazonaws.com/role: cloud_sqs_autoscaler
     spec:
+      serviceAccountName: sqs-autoscaler-controller
       volumes:
         - name: ssl-certs
           hostPath:
