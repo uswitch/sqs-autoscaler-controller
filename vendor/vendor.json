@@ -51,6 +51,12 @@
 			"revisionTime": "2015-10-22T06:55:26Z"
 		},
 		{
+			"checksumSHA1": "z3w0/RWtAvm05X14QABegeo7JA4=",
+			"path": "github.com/aws/aws-sdk-go",
+			"revision": "0b647699a7b7296329f1f9e975f7de1c1a006eff",
+			"revisionTime": "2019-07-11T17:00:28Z"
+		},
+		{
 			"checksumSHA1": "nDW4/vdHc9LNbui2yq4TJpHJoc8=",
 			"path": "github.com/aws/aws-sdk-go/aws",
 			"revision": "ae53883b2478fd8e2bdca2748367d5b5fa27ca22",
