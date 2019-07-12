@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"time"
+	"math"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/rcrowley/go-metrics"
@@ -63,21 +64,29 @@ func scaleFields(scaler *crd.SqsAutoScaler) log.Fields {
 	return log.Fields{"name": scaler.ObjectMeta.Name, "namespace": scaler.ObjectMeta.Namespace, "queue": scaler.Spec.Queue, "deploy": scaler.Spec.Deployment}
 }
 
-func (s Scaler) targetReplicas(size int64, scale *crd.SqsAutoScaler, d *appsv1.Deployment) (int32, error) {
+func (s Scaler) targetReplicas(approximateNumberOfMessages int64, numberOfEmptyReceives int64, scale *crd.SqsAutoScaler, d *appsv1.Deployment) (int32, error) {
 	replicas := d.Status.Replicas
 
-	if size >= scale.Spec.ScaleUp.Threshold {
-		desired := replicas + scale.Spec.ScaleUp.Amount
-		return min(desired, scale.Spec.MaxPods), nil
-	} else if size <= scale.Spec.ScaleDown.Threshold {
-		desired := replicas - scale.Spec.ScaleDown.Amount
+	if (numberOfEmptyReceives > 0) && (replicas > 0) {
+		desired := replicas - 1
 		return max(desired, scale.Spec.MinPods), nil
 	}
+
+	if approximateNumberOfMessages > 0 {
+		desired := replicas + math.Ceil(approximateNumberOfMessages/scale.Spec.ScaleDown.Threshold)
+		return min(desired, scale.Spec.MaxPods), nil
+	}
+
 	return replicas, nil
 }
 
 func (s Scaler) executeScale(ctx context.Context, sess *session.Session, scale *crd.SqsAutoScaler) (*appsv1.Deployment, int32, error) {
 	size, err := CurrentQueueSize(sess, scale.Spec.Queue)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	numberOfEmptyReceives, err := NumberOfEmptyReceives(sess, scale.Spec.Queue)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -92,7 +101,7 @@ func (s Scaler) executeScale(ctx context.Context, sess *session.Session, scale *
 		return nil, 0, fmt.Errorf("deployment available replicas not at target. won't adjust")
 	}
 
-	replicas, err := s.targetReplicas(size, scale, deployment)
+	replicas, err := s.targetReplicas(size, numberOfEmptyReceives, scale, deployment)
 	if err != nil {
 		return nil, 0, err
 	}
