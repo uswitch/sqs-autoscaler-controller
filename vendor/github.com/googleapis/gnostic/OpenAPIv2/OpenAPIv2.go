@@ -20,13 +20,16 @@ import (
 	"fmt"
 	"github.com/googleapis/gnostic/compiler"
 	"gopkg.in/yaml.v2"
+	"regexp"
 	"strings"
 )
 
+// Version returns the package name (and OpenAPI version).
 func Version() string {
 	return "openapi_v2"
 }
 
+// NewAdditionalPropertiesItem creates an object of type AdditionalPropertiesItem if possible, returning an error if not.
 func NewAdditionalPropertiesItem(in interface{}, context *compiler.Context) (*AdditionalPropertiesItem, error) {
 	errors := make([]error, 0)
 	x := &AdditionalPropertiesItem{}
@@ -36,12 +39,12 @@ func NewAdditionalPropertiesItem(in interface{}, context *compiler.Context) (*Ad
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matching_error := NewSchema(m, compiler.NewContext("schema", context))
-			if matching_error == nil {
+			t, matchingError := NewSchema(m, compiler.NewContext("schema", context))
+			if matchingError == nil {
 				x.Oneof = &AdditionalPropertiesItem_Schema{Schema: t}
 				matched = true
 			} else {
-				errors = append(errors, matching_error)
+				errors = append(errors, matchingError)
 			}
 		}
 	}
@@ -57,6 +60,7 @@ func NewAdditionalPropertiesItem(in interface{}, context *compiler.Context) (*Ad
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewAny creates an object of type Any if possible, returning an error if not.
 func NewAny(in interface{}, context *compiler.Context) (*Any, error) {
 	errors := make([]error, 0)
 	x := &Any{}
@@ -65,6 +69,7 @@ func NewAny(in interface{}, context *compiler.Context) (*Any, error) {
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewApiKeySecurity creates an object of type ApiKeySecurity if possible, returning an error if not.
 func NewApiKeySecurity(in interface{}, context *compiler.Context) (*ApiKeySecurity, error) {
 	errors := make([]error, 0)
 	x := &ApiKeySecurity{}
@@ -80,7 +85,7 @@ func NewApiKeySecurity(in interface{}, context *compiler.Context) (*ApiKeySecuri
 			errors = append(errors, compiler.NewError(context, message))
 		}
 		allowedKeys := []string{"description", "in", "name", "type"}
-		allowedPatterns := []string{"^x-"}
+		allowedPatterns := []*regexp.Regexp{pattern0}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
@@ -141,7 +146,7 @@ func NewApiKeySecurity(in interface{}, context *compiler.Context) (*ApiKeySecuri
 			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
-				if compiler.PatternMatches("^x-", k) {
+				if strings.HasPrefix(k, "x-") {
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
@@ -169,6 +174,7 @@ func NewApiKeySecurity(in interface{}, context *compiler.Context) (*ApiKeySecuri
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewBasicAuthenticationSecurity creates an object of type BasicAuthenticationSecurity if possible, returning an error if not.
 func NewBasicAuthenticationSecurity(in interface{}, context *compiler.Context) (*BasicAuthenticationSecurity, error) {
 	errors := make([]error, 0)
 	x := &BasicAuthenticationSecurity{}
@@ -184,7 +190,7 @@ func NewBasicAuthenticationSecurity(in interface{}, context *compiler.Context) (
 			errors = append(errors, compiler.NewError(context, message))
 		}
 		allowedKeys := []string{"description", "type"}
-		allowedPatterns := []string{"^x-"}
+		allowedPatterns := []*regexp.Regexp{pattern0}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
@@ -221,7 +227,7 @@ func NewBasicAuthenticationSecurity(in interface{}, context *compiler.Context) (
 			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
-				if compiler.PatternMatches("^x-", k) {
+				if strings.HasPrefix(k, "x-") {
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
@@ -249,6 +255,7 @@ func NewBasicAuthenticationSecurity(in interface{}, context *compiler.Context) (
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewBodyParameter creates an object of type BodyParameter if possible, returning an error if not.
 func NewBodyParameter(in interface{}, context *compiler.Context) (*BodyParameter, error) {
 	errors := make([]error, 0)
 	x := &BodyParameter{}
@@ -264,7 +271,7 @@ func NewBodyParameter(in interface{}, context *compiler.Context) (*BodyParameter
 			errors = append(errors, compiler.NewError(context, message))
 		}
 		allowedKeys := []string{"description", "in", "name", "required", "schema"}
-		allowedPatterns := []string{"^x-"}
+		allowedPatterns := []*regexp.Regexp{pattern0}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
@@ -328,7 +335,7 @@ func NewBodyParameter(in interface{}, context *compiler.Context) (*BodyParameter
 			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
-				if compiler.PatternMatches("^x-", k) {
+				if strings.HasPrefix(k, "x-") {
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
@@ -356,6 +363,7 @@ func NewBodyParameter(in interface{}, context *compiler.Context) (*BodyParameter
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewContact creates an object of type Contact if possible, returning an error if not.
 func NewContact(in interface{}, context *compiler.Context) (*Contact, error) {
 	errors := make([]error, 0)
 	x := &Contact{}
@@ -365,7 +373,7 @@ func NewContact(in interface{}, context *compiler.Context) (*Contact, error) {
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		allowedKeys := []string{"email", "name", "url"}
-		allowedPatterns := []string{"^x-"}
+		allowedPatterns := []*regexp.Regexp{pattern0}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
@@ -405,7 +413,7 @@ func NewContact(in interface{}, context *compiler.Context) (*Contact, error) {
 			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
-				if compiler.PatternMatches("^x-", k) {
+				if strings.HasPrefix(k, "x-") {
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
@@ -433,6 +441,7 @@ func NewContact(in interface{}, context *compiler.Context) (*Contact, error) {
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewDefault creates an object of type Default if possible, returning an error if not.
 func NewDefault(in interface{}, context *compiler.Context) (*Default, error) {
 	errors := make([]error, 0)
 	x := &Default{}
@@ -474,6 +483,7 @@ func NewDefault(in interface{}, context *compiler.Context) (*Default, error) {
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewDefinitions creates an object of type Definitions if possible, returning an error if not.
 func NewDefinitions(in interface{}, context *compiler.Context) (*Definitions, error) {
 	errors := make([]error, 0)
 	x := &Definitions{}
@@ -503,6 +513,7 @@ func NewDefinitions(in interface{}, context *compiler.Context) (*Definitions, er
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewDocument creates an object of type Document if possible, returning an error if not.
 func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 	errors := make([]error, 0)
 	x := &Document{}
@@ -518,7 +529,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 			errors = append(errors, compiler.NewError(context, message))
 		}
 		allowedKeys := []string{"basePath", "consumes", "definitions", "externalDocs", "host", "info", "parameters", "paths", "produces", "responses", "schemes", "security", "securityDefinitions", "swagger", "tags"}
-		allowedPatterns := []string{"^x-"}
+		allowedPatterns := []*regexp.Regexp{pattern0}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
@@ -698,7 +709,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
-				if compiler.PatternMatches("^x-", k) {
+				if strings.HasPrefix(k, "x-") {
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
@@ -726,6 +737,7 @@ func NewDocument(in interface{}, context *compiler.Context) (*Document, error) {
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewExamples creates an object of type Examples if possible, returning an error if not.
 func NewExamples(in interface{}, context *compiler.Context) (*Examples, error) {
 	errors := make([]error, 0)
 	x := &Examples{}
@@ -767,6 +779,7 @@ func NewExamples(in interface{}, context *compiler.Context) (*Examples, error) {
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewExternalDocs creates an object of type ExternalDocs if possible, returning an error if not.
 func NewExternalDocs(in interface{}, context *compiler.Context) (*ExternalDocs, error) {
 	errors := make([]error, 0)
 	x := &ExternalDocs{}
@@ -782,7 +795,7 @@ func NewExternalDocs(in interface{}, context *compiler.Context) (*ExternalDocs, 
 			errors = append(errors, compiler.NewError(context, message))
 		}
 		allowedKeys := []string{"description", "url"}
-		allowedPatterns := []string{"^x-"}
+		allowedPatterns := []*regexp.Regexp{pattern0}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
@@ -813,7 +826,7 @@ func NewExternalDocs(in interface{}, context *compiler.Context) (*ExternalDocs, 
 			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
-				if compiler.PatternMatches("^x-", k) {
+				if strings.HasPrefix(k, "x-") {
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
@@ -841,6 +854,7 @@ func NewExternalDocs(in interface{}, context *compiler.Context) (*ExternalDocs, 
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewFileSchema creates an object of type FileSchema if possible, returning an error if not.
 func NewFileSchema(in interface{}, context *compiler.Context) (*FileSchema, error) {
 	errors := make([]error, 0)
 	x := &FileSchema{}
@@ -856,7 +870,7 @@ func NewFileSchema(in interface{}, context *compiler.Context) (*FileSchema, erro
 			errors = append(errors, compiler.NewError(context, message))
 		}
 		allowedKeys := []string{"default", "description", "example", "externalDocs", "format", "readOnly", "required", "title", "type"}
-		allowedPatterns := []string{"^x-"}
+		allowedPatterns := []*regexp.Regexp{pattern0}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
@@ -958,7 +972,7 @@ func NewFileSchema(in interface{}, context *compiler.Context) (*FileSchema, erro
 			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
-				if compiler.PatternMatches("^x-", k) {
+				if strings.HasPrefix(k, "x-") {
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
@@ -986,6 +1000,7 @@ func NewFileSchema(in interface{}, context *compiler.Context) (*FileSchema, erro
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewFormDataParameterSubSchema creates an object of type FormDataParameterSubSchema if possible, returning an error if not.
 func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*FormDataParameterSubSchema, error) {
 	errors := make([]error, 0)
 	x := &FormDataParameterSubSchema{}
@@ -995,7 +1010,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		allowedKeys := []string{"allowEmptyValue", "collectionFormat", "default", "description", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "in", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "name", "pattern", "required", "type", "uniqueItems"}
-		allowedPatterns := []string{"^x-"}
+		allowedPatterns := []*regexp.Regexp{pattern0}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
@@ -1281,7 +1296,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
-				if compiler.PatternMatches("^x-", k) {
+				if strings.HasPrefix(k, "x-") {
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
@@ -1309,6 +1324,7 @@ func NewFormDataParameterSubSchema(in interface{}, context *compiler.Context) (*
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewHeader creates an object of type Header if possible, returning an error if not.
 func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 	errors := make([]error, 0)
 	x := &Header{}
@@ -1324,7 +1340,7 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 			errors = append(errors, compiler.NewError(context, message))
 		}
 		allowedKeys := []string{"collectionFormat", "default", "description", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "pattern", "type", "uniqueItems"}
-		allowedPatterns := []string{"^x-"}
+		allowedPatterns := []*regexp.Regexp{pattern0}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
@@ -1568,7 +1584,7 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
-				if compiler.PatternMatches("^x-", k) {
+				if strings.HasPrefix(k, "x-") {
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
@@ -1596,6 +1612,7 @@ func NewHeader(in interface{}, context *compiler.Context) (*Header, error) {
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewHeaderParameterSubSchema creates an object of type HeaderParameterSubSchema if possible, returning an error if not.
 func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*HeaderParameterSubSchema, error) {
 	errors := make([]error, 0)
 	x := &HeaderParameterSubSchema{}
@@ -1605,7 +1622,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		allowedKeys := []string{"collectionFormat", "default", "description", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "in", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "name", "pattern", "required", "type", "uniqueItems"}
-		allowedPatterns := []string{"^x-"}
+		allowedPatterns := []*regexp.Regexp{pattern0}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
@@ -1882,7 +1899,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
-				if compiler.PatternMatches("^x-", k) {
+				if strings.HasPrefix(k, "x-") {
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
@@ -1910,6 +1927,7 @@ func NewHeaderParameterSubSchema(in interface{}, context *compiler.Context) (*He
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewHeaders creates an object of type Headers if possible, returning an error if not.
 func NewHeaders(in interface{}, context *compiler.Context) (*Headers, error) {
 	errors := make([]error, 0)
 	x := &Headers{}
@@ -1939,6 +1957,7 @@ func NewHeaders(in interface{}, context *compiler.Context) (*Headers, error) {
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewInfo creates an object of type Info if possible, returning an error if not.
 func NewInfo(in interface{}, context *compiler.Context) (*Info, error) {
 	errors := make([]error, 0)
 	x := &Info{}
@@ -1954,7 +1973,7 @@ func NewInfo(in interface{}, context *compiler.Context) (*Info, error) {
 			errors = append(errors, compiler.NewError(context, message))
 		}
 		allowedKeys := []string{"contact", "description", "license", "termsOfService", "title", "version"}
-		allowedPatterns := []string{"^x-"}
+		allowedPatterns := []*regexp.Regexp{pattern0}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
@@ -2021,7 +2040,7 @@ func NewInfo(in interface{}, context *compiler.Context) (*Info, error) {
 			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
-				if compiler.PatternMatches("^x-", k) {
+				if strings.HasPrefix(k, "x-") {
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
@@ -2049,6 +2068,7 @@ func NewInfo(in interface{}, context *compiler.Context) (*Info, error) {
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewItemsItem creates an object of type ItemsItem if possible, returning an error if not.
 func NewItemsItem(in interface{}, context *compiler.Context) (*ItemsItem, error) {
 	errors := make([]error, 0)
 	x := &ItemsItem{}
@@ -2067,6 +2087,7 @@ func NewItemsItem(in interface{}, context *compiler.Context) (*ItemsItem, error)
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewJsonReference creates an object of type JsonReference if possible, returning an error if not.
 func NewJsonReference(in interface{}, context *compiler.Context) (*JsonReference, error) {
 	errors := make([]error, 0)
 	x := &JsonReference{}
@@ -2082,7 +2103,7 @@ func NewJsonReference(in interface{}, context *compiler.Context) (*JsonReference
 			errors = append(errors, compiler.NewError(context, message))
 		}
 		allowedKeys := []string{"$ref", "description"}
-		allowedPatterns := []string{}
+		var allowedPatterns []*regexp.Regexp
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
@@ -2110,6 +2131,7 @@ func NewJsonReference(in interface{}, context *compiler.Context) (*JsonReference
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewLicense creates an object of type License if possible, returning an error if not.
 func NewLicense(in interface{}, context *compiler.Context) (*License, error) {
 	errors := make([]error, 0)
 	x := &License{}
@@ -2125,7 +2147,7 @@ func NewLicense(in interface{}, context *compiler.Context) (*License, error) {
 			errors = append(errors, compiler.NewError(context, message))
 		}
 		allowedKeys := []string{"name", "url"}
-		allowedPatterns := []string{"^x-"}
+		allowedPatterns := []*regexp.Regexp{pattern0}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
@@ -2156,7 +2178,7 @@ func NewLicense(in interface{}, context *compiler.Context) (*License, error) {
 			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
-				if compiler.PatternMatches("^x-", k) {
+				if strings.HasPrefix(k, "x-") {
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
@@ -2184,6 +2206,7 @@ func NewLicense(in interface{}, context *compiler.Context) (*License, error) {
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewNamedAny creates an object of type NamedAny if possible, returning an error if not.
 func NewNamedAny(in interface{}, context *compiler.Context) (*NamedAny, error) {
 	errors := make([]error, 0)
 	x := &NamedAny{}
@@ -2193,7 +2216,7 @@ func NewNamedAny(in interface{}, context *compiler.Context) (*NamedAny, error) {
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		allowedKeys := []string{"name", "value"}
-		allowedPatterns := []string{}
+		var allowedPatterns []*regexp.Regexp
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
@@ -2221,6 +2244,7 @@ func NewNamedAny(in interface{}, context *compiler.Context) (*NamedAny, error) {
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewNamedHeader creates an object of type NamedHeader if possible, returning an error if not.
 func NewNamedHeader(in interface{}, context *compiler.Context) (*NamedHeader, error) {
 	errors := make([]error, 0)
 	x := &NamedHeader{}
@@ -2230,7 +2254,7 @@ func NewNamedHeader(in interface{}, context *compiler.Context) (*NamedHeader, er
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		allowedKeys := []string{"name", "value"}
-		allowedPatterns := []string{}
+		var allowedPatterns []*regexp.Regexp
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
@@ -2258,6 +2282,7 @@ func NewNamedHeader(in interface{}, context *compiler.Context) (*NamedHeader, er
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewNamedParameter creates an object of type NamedParameter if possible, returning an error if not.
 func NewNamedParameter(in interface{}, context *compiler.Context) (*NamedParameter, error) {
 	errors := make([]error, 0)
 	x := &NamedParameter{}
@@ -2267,7 +2292,7 @@ func NewNamedParameter(in interface{}, context *compiler.Context) (*NamedParamet
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		allowedKeys := []string{"name", "value"}
-		allowedPatterns := []string{}
+		var allowedPatterns []*regexp.Regexp
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
@@ -2295,6 +2320,7 @@ func NewNamedParameter(in interface{}, context *compiler.Context) (*NamedParamet
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewNamedPathItem creates an object of type NamedPathItem if possible, returning an error if not.
 func NewNamedPathItem(in interface{}, context *compiler.Context) (*NamedPathItem, error) {
 	errors := make([]error, 0)
 	x := &NamedPathItem{}
@@ -2304,7 +2330,7 @@ func NewNamedPathItem(in interface{}, context *compiler.Context) (*NamedPathItem
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		allowedKeys := []string{"name", "value"}
-		allowedPatterns := []string{}
+		var allowedPatterns []*regexp.Regexp
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
@@ -2332,6 +2358,7 @@ func NewNamedPathItem(in interface{}, context *compiler.Context) (*NamedPathItem
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewNamedResponse creates an object of type NamedResponse if possible, returning an error if not.
 func NewNamedResponse(in interface{}, context *compiler.Context) (*NamedResponse, error) {
 	errors := make([]error, 0)
 	x := &NamedResponse{}
@@ -2341,7 +2368,7 @@ func NewNamedResponse(in interface{}, context *compiler.Context) (*NamedResponse
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		allowedKeys := []string{"name", "value"}
-		allowedPatterns := []string{}
+		var allowedPatterns []*regexp.Regexp
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
@@ -2369,6 +2396,7 @@ func NewNamedResponse(in interface{}, context *compiler.Context) (*NamedResponse
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewNamedResponseValue creates an object of type NamedResponseValue if possible, returning an error if not.
 func NewNamedResponseValue(in interface{}, context *compiler.Context) (*NamedResponseValue, error) {
 	errors := make([]error, 0)
 	x := &NamedResponseValue{}
@@ -2378,7 +2406,7 @@ func NewNamedResponseValue(in interface{}, context *compiler.Context) (*NamedRes
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		allowedKeys := []string{"name", "value"}
-		allowedPatterns := []string{}
+		var allowedPatterns []*regexp.Regexp
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
@@ -2406,6 +2434,7 @@ func NewNamedResponseValue(in interface{}, context *compiler.Context) (*NamedRes
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewNamedSchema creates an object of type NamedSchema if possible, returning an error if not.
 func NewNamedSchema(in interface{}, context *compiler.Context) (*NamedSchema, error) {
 	errors := make([]error, 0)
 	x := &NamedSchema{}
@@ -2415,7 +2444,7 @@ func NewNamedSchema(in interface{}, context *compiler.Context) (*NamedSchema, er
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		allowedKeys := []string{"name", "value"}
-		allowedPatterns := []string{}
+		var allowedPatterns []*regexp.Regexp
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
@@ -2443,6 +2472,7 @@ func NewNamedSchema(in interface{}, context *compiler.Context) (*NamedSchema, er
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewNamedSecurityDefinitionsItem creates an object of type NamedSecurityDefinitionsItem if possible, returning an error if not.
 func NewNamedSecurityDefinitionsItem(in interface{}, context *compiler.Context) (*NamedSecurityDefinitionsItem, error) {
 	errors := make([]error, 0)
 	x := &NamedSecurityDefinitionsItem{}
@@ -2452,7 +2482,7 @@ func NewNamedSecurityDefinitionsItem(in interface{}, context *compiler.Context) 
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		allowedKeys := []string{"name", "value"}
-		allowedPatterns := []string{}
+		var allowedPatterns []*regexp.Regexp
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
@@ -2480,6 +2510,7 @@ func NewNamedSecurityDefinitionsItem(in interface{}, context *compiler.Context) 
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewNamedString creates an object of type NamedString if possible, returning an error if not.
 func NewNamedString(in interface{}, context *compiler.Context) (*NamedString, error) {
 	errors := make([]error, 0)
 	x := &NamedString{}
@@ -2489,7 +2520,7 @@ func NewNamedString(in interface{}, context *compiler.Context) (*NamedString, er
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		allowedKeys := []string{"name", "value"}
-		allowedPatterns := []string{}
+		var allowedPatterns []*regexp.Regexp
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
@@ -2517,6 +2548,7 @@ func NewNamedString(in interface{}, context *compiler.Context) (*NamedString, er
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewNamedStringArray creates an object of type NamedStringArray if possible, returning an error if not.
 func NewNamedStringArray(in interface{}, context *compiler.Context) (*NamedStringArray, error) {
 	errors := make([]error, 0)
 	x := &NamedStringArray{}
@@ -2526,7 +2558,7 @@ func NewNamedStringArray(in interface{}, context *compiler.Context) (*NamedStrin
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		allowedKeys := []string{"name", "value"}
-		allowedPatterns := []string{}
+		var allowedPatterns []*regexp.Regexp
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
@@ -2554,6 +2586,7 @@ func NewNamedStringArray(in interface{}, context *compiler.Context) (*NamedStrin
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewNonBodyParameter creates an object of type NonBodyParameter if possible, returning an error if not.
 func NewNonBodyParameter(in interface{}, context *compiler.Context) (*NonBodyParameter, error) {
 	errors := make([]error, 0)
 	x := &NonBodyParameter{}
@@ -2572,45 +2605,45 @@ func NewNonBodyParameter(in interface{}, context *compiler.Context) (*NonBodyPar
 		// HeaderParameterSubSchema header_parameter_sub_schema = 1;
 		{
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matching_error := NewHeaderParameterSubSchema(m, compiler.NewContext("headerParameterSubSchema", context))
-			if matching_error == nil {
+			t, matchingError := NewHeaderParameterSubSchema(m, compiler.NewContext("headerParameterSubSchema", context))
+			if matchingError == nil {
 				x.Oneof = &NonBodyParameter_HeaderParameterSubSchema{HeaderParameterSubSchema: t}
 				matched = true
 			} else {
-				errors = append(errors, matching_error)
+				errors = append(errors, matchingError)
 			}
 		}
 		// FormDataParameterSubSchema form_data_parameter_sub_schema = 2;
 		{
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matching_error := NewFormDataParameterSubSchema(m, compiler.NewContext("formDataParameterSubSchema", context))
-			if matching_error == nil {
+			t, matchingError := NewFormDataParameterSubSchema(m, compiler.NewContext("formDataParameterSubSchema", context))
+			if matchingError == nil {
 				x.Oneof = &NonBodyParameter_FormDataParameterSubSchema{FormDataParameterSubSchema: t}
 				matched = true
 			} else {
-				errors = append(errors, matching_error)
+				errors = append(errors, matchingError)
 			}
 		}
 		// QueryParameterSubSchema query_parameter_sub_schema = 3;
 		{
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matching_error := NewQueryParameterSubSchema(m, compiler.NewContext("queryParameterSubSchema", context))
-			if matching_error == nil {
+			t, matchingError := NewQueryParameterSubSchema(m, compiler.NewContext("queryParameterSubSchema", context))
+			if matchingError == nil {
 				x.Oneof = &NonBodyParameter_QueryParameterSubSchema{QueryParameterSubSchema: t}
 				matched = true
 			} else {
-				errors = append(errors, matching_error)
+				errors = append(errors, matchingError)
 			}
 		}
 		// PathParameterSubSchema path_parameter_sub_schema = 4;
 		{
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matching_error := NewPathParameterSubSchema(m, compiler.NewContext("pathParameterSubSchema", context))
-			if matching_error == nil {
+			t, matchingError := NewPathParameterSubSchema(m, compiler.NewContext("pathParameterSubSchema", context))
+			if matchingError == nil {
 				x.Oneof = &NonBodyParameter_PathParameterSubSchema{PathParameterSubSchema: t}
 				matched = true
 			} else {
-				errors = append(errors, matching_error)
+				errors = append(errors, matchingError)
 			}
 		}
 	}
@@ -2621,6 +2654,7 @@ func NewNonBodyParameter(in interface{}, context *compiler.Context) (*NonBodyPar
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewOauth2AccessCodeSecurity creates an object of type Oauth2AccessCodeSecurity if possible, returning an error if not.
 func NewOauth2AccessCodeSecurity(in interface{}, context *compiler.Context) (*Oauth2AccessCodeSecurity, error) {
 	errors := make([]error, 0)
 	x := &Oauth2AccessCodeSecurity{}
@@ -2636,7 +2670,7 @@ func NewOauth2AccessCodeSecurity(in interface{}, context *compiler.Context) (*Oa
 			errors = append(errors, compiler.NewError(context, message))
 		}
 		allowedKeys := []string{"authorizationUrl", "description", "flow", "scopes", "tokenUrl", "type"}
-		allowedPatterns := []string{"^x-"}
+		allowedPatterns := []*regexp.Regexp{pattern0}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
@@ -2715,7 +2749,7 @@ func NewOauth2AccessCodeSecurity(in interface{}, context *compiler.Context) (*Oa
 			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
-				if compiler.PatternMatches("^x-", k) {
+				if strings.HasPrefix(k, "x-") {
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
@@ -2743,6 +2777,7 @@ func NewOauth2AccessCodeSecurity(in interface{}, context *compiler.Context) (*Oa
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewOauth2ApplicationSecurity creates an object of type Oauth2ApplicationSecurity if possible, returning an error if not.
 func NewOauth2ApplicationSecurity(in interface{}, context *compiler.Context) (*Oauth2ApplicationSecurity, error) {
 	errors := make([]error, 0)
 	x := &Oauth2ApplicationSecurity{}
@@ -2758,7 +2793,7 @@ func NewOauth2ApplicationSecurity(in interface{}, context *compiler.Context) (*O
 			errors = append(errors, compiler.NewError(context, message))
 		}
 		allowedKeys := []string{"description", "flow", "scopes", "tokenUrl", "type"}
-		allowedPatterns := []string{"^x-"}
+		allowedPatterns := []*regexp.Regexp{pattern0}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
@@ -2828,7 +2863,7 @@ func NewOauth2ApplicationSecurity(in interface{}, context *compiler.Context) (*O
 			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
-				if compiler.PatternMatches("^x-", k) {
+				if strings.HasPrefix(k, "x-") {
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
@@ -2856,6 +2891,7 @@ func NewOauth2ApplicationSecurity(in interface{}, context *compiler.Context) (*O
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewOauth2ImplicitSecurity creates an object of type Oauth2ImplicitSecurity if possible, returning an error if not.
 func NewOauth2ImplicitSecurity(in interface{}, context *compiler.Context) (*Oauth2ImplicitSecurity, error) {
 	errors := make([]error, 0)
 	x := &Oauth2ImplicitSecurity{}
@@ -2871,7 +2907,7 @@ func NewOauth2ImplicitSecurity(in interface{}, context *compiler.Context) (*Oaut
 			errors = append(errors, compiler.NewError(context, message))
 		}
 		allowedKeys := []string{"authorizationUrl", "description", "flow", "scopes", "type"}
-		allowedPatterns := []string{"^x-"}
+		allowedPatterns := []*regexp.Regexp{pattern0}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
@@ -2941,7 +2977,7 @@ func NewOauth2ImplicitSecurity(in interface{}, context *compiler.Context) (*Oaut
 			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
-				if compiler.PatternMatches("^x-", k) {
+				if strings.HasPrefix(k, "x-") {
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
@@ -2969,6 +3005,7 @@ func NewOauth2ImplicitSecurity(in interface{}, context *compiler.Context) (*Oaut
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewOauth2PasswordSecurity creates an object of type Oauth2PasswordSecurity if possible, returning an error if not.
 func NewOauth2PasswordSecurity(in interface{}, context *compiler.Context) (*Oauth2PasswordSecurity, error) {
 	errors := make([]error, 0)
 	x := &Oauth2PasswordSecurity{}
@@ -2984,7 +3021,7 @@ func NewOauth2PasswordSecurity(in interface{}, context *compiler.Context) (*Oaut
 			errors = append(errors, compiler.NewError(context, message))
 		}
 		allowedKeys := []string{"description", "flow", "scopes", "tokenUrl", "type"}
-		allowedPatterns := []string{"^x-"}
+		allowedPatterns := []*regexp.Regexp{pattern0}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
@@ -3054,7 +3091,7 @@ func NewOauth2PasswordSecurity(in interface{}, context *compiler.Context) (*Oaut
 			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
-				if compiler.PatternMatches("^x-", k) {
+				if strings.HasPrefix(k, "x-") {
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
@@ -3082,6 +3119,7 @@ func NewOauth2PasswordSecurity(in interface{}, context *compiler.Context) (*Oaut
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewOauth2Scopes creates an object of type Oauth2Scopes if possible, returning an error if not.
 func NewOauth2Scopes(in interface{}, context *compiler.Context) (*Oauth2Scopes, error) {
 	errors := make([]error, 0)
 	x := &Oauth2Scopes{}
@@ -3107,6 +3145,7 @@ func NewOauth2Scopes(in interface{}, context *compiler.Context) (*Oauth2Scopes, 
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewOperation creates an object of type Operation if possible, returning an error if not.
 func NewOperation(in interface{}, context *compiler.Context) (*Operation, error) {
 	errors := make([]error, 0)
 	x := &Operation{}
@@ -3122,7 +3161,7 @@ func NewOperation(in interface{}, context *compiler.Context) (*Operation, error)
 			errors = append(errors, compiler.NewError(context, message))
 		}
 		allowedKeys := []string{"consumes", "deprecated", "description", "externalDocs", "operationId", "parameters", "produces", "responses", "schemes", "security", "summary", "tags"}
-		allowedPatterns := []string{"^x-"}
+		allowedPatterns := []*regexp.Regexp{pattern0}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
@@ -3271,7 +3310,7 @@ func NewOperation(in interface{}, context *compiler.Context) (*Operation, error)
 			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
-				if compiler.PatternMatches("^x-", k) {
+				if strings.HasPrefix(k, "x-") {
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
@@ -3299,6 +3338,7 @@ func NewOperation(in interface{}, context *compiler.Context) (*Operation, error)
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewParameter creates an object of type Parameter if possible, returning an error if not.
 func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error) {
 	errors := make([]error, 0)
 	x := &Parameter{}
@@ -3308,12 +3348,12 @@ func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error)
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matching_error := NewBodyParameter(m, compiler.NewContext("bodyParameter", context))
-			if matching_error == nil {
+			t, matchingError := NewBodyParameter(m, compiler.NewContext("bodyParameter", context))
+			if matchingError == nil {
 				x.Oneof = &Parameter_BodyParameter{BodyParameter: t}
 				matched = true
 			} else {
-				errors = append(errors, matching_error)
+				errors = append(errors, matchingError)
 			}
 		}
 	}
@@ -3322,12 +3362,12 @@ func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error)
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matching_error := NewNonBodyParameter(m, compiler.NewContext("nonBodyParameter", context))
-			if matching_error == nil {
+			t, matchingError := NewNonBodyParameter(m, compiler.NewContext("nonBodyParameter", context))
+			if matchingError == nil {
 				x.Oneof = &Parameter_NonBodyParameter{NonBodyParameter: t}
 				matched = true
 			} else {
-				errors = append(errors, matching_error)
+				errors = append(errors, matchingError)
 			}
 		}
 	}
@@ -3338,6 +3378,7 @@ func NewParameter(in interface{}, context *compiler.Context) (*Parameter, error)
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewParameterDefinitions creates an object of type ParameterDefinitions if possible, returning an error if not.
 func NewParameterDefinitions(in interface{}, context *compiler.Context) (*ParameterDefinitions, error) {
 	errors := make([]error, 0)
 	x := &ParameterDefinitions{}
@@ -3367,6 +3408,7 @@ func NewParameterDefinitions(in interface{}, context *compiler.Context) (*Parame
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewParametersItem creates an object of type ParametersItem if possible, returning an error if not.
 func NewParametersItem(in interface{}, context *compiler.Context) (*ParametersItem, error) {
 	errors := make([]error, 0)
 	x := &ParametersItem{}
@@ -3376,12 +3418,12 @@ func NewParametersItem(in interface{}, context *compiler.Context) (*ParametersIt
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matching_error := NewParameter(m, compiler.NewContext("parameter", context))
-			if matching_error == nil {
+			t, matchingError := NewParameter(m, compiler.NewContext("parameter", context))
+			if matchingError == nil {
 				x.Oneof = &ParametersItem_Parameter{Parameter: t}
 				matched = true
 			} else {
-				errors = append(errors, matching_error)
+				errors = append(errors, matchingError)
 			}
 		}
 	}
@@ -3390,12 +3432,12 @@ func NewParametersItem(in interface{}, context *compiler.Context) (*ParametersIt
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matching_error := NewJsonReference(m, compiler.NewContext("jsonReference", context))
-			if matching_error == nil {
+			t, matchingError := NewJsonReference(m, compiler.NewContext("jsonReference", context))
+			if matchingError == nil {
 				x.Oneof = &ParametersItem_JsonReference{JsonReference: t}
 				matched = true
 			} else {
-				errors = append(errors, matching_error)
+				errors = append(errors, matchingError)
 			}
 		}
 	}
@@ -3406,6 +3448,7 @@ func NewParametersItem(in interface{}, context *compiler.Context) (*ParametersIt
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewPathItem creates an object of type PathItem if possible, returning an error if not.
 func NewPathItem(in interface{}, context *compiler.Context) (*PathItem, error) {
 	errors := make([]error, 0)
 	x := &PathItem{}
@@ -3415,7 +3458,7 @@ func NewPathItem(in interface{}, context *compiler.Context) (*PathItem, error) {
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		allowedKeys := []string{"$ref", "delete", "get", "head", "options", "parameters", "patch", "post", "put"}
-		allowedPatterns := []string{"^x-"}
+		allowedPatterns := []*regexp.Regexp{pattern0}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
@@ -3516,7 +3559,7 @@ func NewPathItem(in interface{}, context *compiler.Context) (*PathItem, error) {
 			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
-				if compiler.PatternMatches("^x-", k) {
+				if strings.HasPrefix(k, "x-") {
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
@@ -3544,6 +3587,7 @@ func NewPathItem(in interface{}, context *compiler.Context) (*PathItem, error) {
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewPathParameterSubSchema creates an object of type PathParameterSubSchema if possible, returning an error if not.
 func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*PathParameterSubSchema, error) {
 	errors := make([]error, 0)
 	x := &PathParameterSubSchema{}
@@ -3559,7 +3603,7 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 			errors = append(errors, compiler.NewError(context, message))
 		}
 		allowedKeys := []string{"collectionFormat", "default", "description", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "in", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "name", "pattern", "required", "type", "uniqueItems"}
-		allowedPatterns := []string{"^x-"}
+		allowedPatterns := []*regexp.Regexp{pattern0}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
@@ -3836,7 +3880,7 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
-				if compiler.PatternMatches("^x-", k) {
+				if strings.HasPrefix(k, "x-") {
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
@@ -3864,6 +3908,7 @@ func NewPathParameterSubSchema(in interface{}, context *compiler.Context) (*Path
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewPaths creates an object of type Paths if possible, returning an error if not.
 func NewPaths(in interface{}, context *compiler.Context) (*Paths, error) {
 	errors := make([]error, 0)
 	x := &Paths{}
@@ -3873,7 +3918,7 @@ func NewPaths(in interface{}, context *compiler.Context) (*Paths, error) {
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		allowedKeys := []string{}
-		allowedPatterns := []string{"^x-", "^/"}
+		allowedPatterns := []*regexp.Regexp{pattern0, pattern1}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
@@ -3886,7 +3931,7 @@ func NewPaths(in interface{}, context *compiler.Context) (*Paths, error) {
 			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
-				if compiler.PatternMatches("^x-", k) {
+				if strings.HasPrefix(k, "x-") {
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
@@ -3917,7 +3962,7 @@ func NewPaths(in interface{}, context *compiler.Context) (*Paths, error) {
 			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
-				if compiler.PatternMatches("^/", k) {
+				if strings.HasPrefix(k, "/") {
 					pair := &NamedPathItem{}
 					pair.Name = k
 					var err error
@@ -3933,6 +3978,7 @@ func NewPaths(in interface{}, context *compiler.Context) (*Paths, error) {
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewPrimitivesItems creates an object of type PrimitivesItems if possible, returning an error if not.
 func NewPrimitivesItems(in interface{}, context *compiler.Context) (*PrimitivesItems, error) {
 	errors := make([]error, 0)
 	x := &PrimitivesItems{}
@@ -3942,7 +3988,7 @@ func NewPrimitivesItems(in interface{}, context *compiler.Context) (*PrimitivesI
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		allowedKeys := []string{"collectionFormat", "default", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "pattern", "type", "uniqueItems"}
-		allowedPatterns := []string{"^x-"}
+		allowedPatterns := []*regexp.Regexp{pattern0}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
@@ -4177,7 +4223,7 @@ func NewPrimitivesItems(in interface{}, context *compiler.Context) (*PrimitivesI
 			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
-				if compiler.PatternMatches("^x-", k) {
+				if strings.HasPrefix(k, "x-") {
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
@@ -4205,6 +4251,7 @@ func NewPrimitivesItems(in interface{}, context *compiler.Context) (*PrimitivesI
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewProperties creates an object of type Properties if possible, returning an error if not.
 func NewProperties(in interface{}, context *compiler.Context) (*Properties, error) {
 	errors := make([]error, 0)
 	x := &Properties{}
@@ -4234,6 +4281,7 @@ func NewProperties(in interface{}, context *compiler.Context) (*Properties, erro
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewQueryParameterSubSchema creates an object of type QueryParameterSubSchema if possible, returning an error if not.
 func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*QueryParameterSubSchema, error) {
 	errors := make([]error, 0)
 	x := &QueryParameterSubSchema{}
@@ -4243,7 +4291,7 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		allowedKeys := []string{"allowEmptyValue", "collectionFormat", "default", "description", "enum", "exclusiveMaximum", "exclusiveMinimum", "format", "in", "items", "maxItems", "maxLength", "maximum", "minItems", "minLength", "minimum", "multipleOf", "name", "pattern", "required", "type", "uniqueItems"}
-		allowedPatterns := []string{"^x-"}
+		allowedPatterns := []*regexp.Regexp{pattern0}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
@@ -4529,7 +4577,7 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
-				if compiler.PatternMatches("^x-", k) {
+				if strings.HasPrefix(k, "x-") {
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
@@ -4557,6 +4605,7 @@ func NewQueryParameterSubSchema(in interface{}, context *compiler.Context) (*Que
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewResponse creates an object of type Response if possible, returning an error if not.
 func NewResponse(in interface{}, context *compiler.Context) (*Response, error) {
 	errors := make([]error, 0)
 	x := &Response{}
@@ -4572,7 +4621,7 @@ func NewResponse(in interface{}, context *compiler.Context) (*Response, error) {
 			errors = append(errors, compiler.NewError(context, message))
 		}
 		allowedKeys := []string{"description", "examples", "headers", "schema"}
-		allowedPatterns := []string{"^x-"}
+		allowedPatterns := []*regexp.Regexp{pattern0}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
@@ -4621,7 +4670,7 @@ func NewResponse(in interface{}, context *compiler.Context) (*Response, error) {
 			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
-				if compiler.PatternMatches("^x-", k) {
+				if strings.HasPrefix(k, "x-") {
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
@@ -4649,6 +4698,7 @@ func NewResponse(in interface{}, context *compiler.Context) (*Response, error) {
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewResponseDefinitions creates an object of type ResponseDefinitions if possible, returning an error if not.
 func NewResponseDefinitions(in interface{}, context *compiler.Context) (*ResponseDefinitions, error) {
 	errors := make([]error, 0)
 	x := &ResponseDefinitions{}
@@ -4678,6 +4728,7 @@ func NewResponseDefinitions(in interface{}, context *compiler.Context) (*Respons
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewResponseValue creates an object of type ResponseValue if possible, returning an error if not.
 func NewResponseValue(in interface{}, context *compiler.Context) (*ResponseValue, error) {
 	errors := make([]error, 0)
 	x := &ResponseValue{}
@@ -4687,12 +4738,12 @@ func NewResponseValue(in interface{}, context *compiler.Context) (*ResponseValue
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matching_error := NewResponse(m, compiler.NewContext("response", context))
-			if matching_error == nil {
+			t, matchingError := NewResponse(m, compiler.NewContext("response", context))
+			if matchingError == nil {
 				x.Oneof = &ResponseValue_Response{Response: t}
 				matched = true
 			} else {
-				errors = append(errors, matching_error)
+				errors = append(errors, matchingError)
 			}
 		}
 	}
@@ -4701,12 +4752,12 @@ func NewResponseValue(in interface{}, context *compiler.Context) (*ResponseValue
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matching_error := NewJsonReference(m, compiler.NewContext("jsonReference", context))
-			if matching_error == nil {
+			t, matchingError := NewJsonReference(m, compiler.NewContext("jsonReference", context))
+			if matchingError == nil {
 				x.Oneof = &ResponseValue_JsonReference{JsonReference: t}
 				matched = true
 			} else {
-				errors = append(errors, matching_error)
+				errors = append(errors, matchingError)
 			}
 		}
 	}
@@ -4717,6 +4768,7 @@ func NewResponseValue(in interface{}, context *compiler.Context) (*ResponseValue
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewResponses creates an object of type Responses if possible, returning an error if not.
 func NewResponses(in interface{}, context *compiler.Context) (*Responses, error) {
 	errors := make([]error, 0)
 	x := &Responses{}
@@ -4726,7 +4778,7 @@ func NewResponses(in interface{}, context *compiler.Context) (*Responses, error)
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		allowedKeys := []string{}
-		allowedPatterns := []string{"^([0-9]{3})$|^(default)$", "^x-"}
+		allowedPatterns := []*regexp.Regexp{pattern2, pattern0}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
@@ -4739,7 +4791,7 @@ func NewResponses(in interface{}, context *compiler.Context) (*Responses, error)
 			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
-				if compiler.PatternMatches("^([0-9]{3})$|^(default)$", k) {
+				if pattern2.MatchString(k) {
 					pair := &NamedResponseValue{}
 					pair.Name = k
 					var err error
@@ -4758,7 +4810,7 @@ func NewResponses(in interface{}, context *compiler.Context) (*Responses, error)
 			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
-				if compiler.PatternMatches("^x-", k) {
+				if strings.HasPrefix(k, "x-") {
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
@@ -4786,6 +4838,7 @@ func NewResponses(in interface{}, context *compiler.Context) (*Responses, error)
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewSchema creates an object of type Schema if possible, returning an error if not.
 func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 	errors := make([]error, 0)
 	x := &Schema{}
@@ -4795,7 +4848,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		allowedKeys := []string{"$ref", "additionalProperties", "allOf", "default", "description", "discriminator", "enum", "example", "exclusiveMaximum", "exclusiveMinimum", "externalDocs", "format", "items", "maxItems", "maxLength", "maxProperties", "maximum", "minItems", "minLength", "minProperties", "minimum", "multipleOf", "pattern", "properties", "readOnly", "required", "title", "type", "uniqueItems", "xml"}
-		allowedPatterns := []string{"^x-"}
+		allowedPatterns := []*regexp.Regexp{pattern0}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
@@ -5148,7 +5201,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
-				if compiler.PatternMatches("^x-", k) {
+				if strings.HasPrefix(k, "x-") {
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
@@ -5176,6 +5229,7 @@ func NewSchema(in interface{}, context *compiler.Context) (*Schema, error) {
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewSchemaItem creates an object of type SchemaItem if possible, returning an error if not.
 func NewSchemaItem(in interface{}, context *compiler.Context) (*SchemaItem, error) {
 	errors := make([]error, 0)
 	x := &SchemaItem{}
@@ -5185,12 +5239,12 @@ func NewSchemaItem(in interface{}, context *compiler.Context) (*SchemaItem, erro
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matching_error := NewSchema(m, compiler.NewContext("schema", context))
-			if matching_error == nil {
+			t, matchingError := NewSchema(m, compiler.NewContext("schema", context))
+			if matchingError == nil {
 				x.Oneof = &SchemaItem_Schema{Schema: t}
 				matched = true
 			} else {
-				errors = append(errors, matching_error)
+				errors = append(errors, matchingError)
 			}
 		}
 	}
@@ -5199,12 +5253,12 @@ func NewSchemaItem(in interface{}, context *compiler.Context) (*SchemaItem, erro
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matching_error := NewFileSchema(m, compiler.NewContext("fileSchema", context))
-			if matching_error == nil {
+			t, matchingError := NewFileSchema(m, compiler.NewContext("fileSchema", context))
+			if matchingError == nil {
 				x.Oneof = &SchemaItem_FileSchema{FileSchema: t}
 				matched = true
 			} else {
-				errors = append(errors, matching_error)
+				errors = append(errors, matchingError)
 			}
 		}
 	}
@@ -5215,6 +5269,7 @@ func NewSchemaItem(in interface{}, context *compiler.Context) (*SchemaItem, erro
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewSecurityDefinitions creates an object of type SecurityDefinitions if possible, returning an error if not.
 func NewSecurityDefinitions(in interface{}, context *compiler.Context) (*SecurityDefinitions, error) {
 	errors := make([]error, 0)
 	x := &SecurityDefinitions{}
@@ -5244,6 +5299,7 @@ func NewSecurityDefinitions(in interface{}, context *compiler.Context) (*Securit
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewSecurityDefinitionsItem creates an object of type SecurityDefinitionsItem if possible, returning an error if not.
 func NewSecurityDefinitionsItem(in interface{}, context *compiler.Context) (*SecurityDefinitionsItem, error) {
 	errors := make([]error, 0)
 	x := &SecurityDefinitionsItem{}
@@ -5253,12 +5309,12 @@ func NewSecurityDefinitionsItem(in interface{}, context *compiler.Context) (*Sec
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matching_error := NewBasicAuthenticationSecurity(m, compiler.NewContext("basicAuthenticationSecurity", context))
-			if matching_error == nil {
+			t, matchingError := NewBasicAuthenticationSecurity(m, compiler.NewContext("basicAuthenticationSecurity", context))
+			if matchingError == nil {
 				x.Oneof = &SecurityDefinitionsItem_BasicAuthenticationSecurity{BasicAuthenticationSecurity: t}
 				matched = true
 			} else {
-				errors = append(errors, matching_error)
+				errors = append(errors, matchingError)
 			}
 		}
 	}
@@ -5267,12 +5323,12 @@ func NewSecurityDefinitionsItem(in interface{}, context *compiler.Context) (*Sec
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matching_error := NewApiKeySecurity(m, compiler.NewContext("apiKeySecurity", context))
-			if matching_error == nil {
+			t, matchingError := NewApiKeySecurity(m, compiler.NewContext("apiKeySecurity", context))
+			if matchingError == nil {
 				x.Oneof = &SecurityDefinitionsItem_ApiKeySecurity{ApiKeySecurity: t}
 				matched = true
 			} else {
-				errors = append(errors, matching_error)
+				errors = append(errors, matchingError)
 			}
 		}
 	}
@@ -5281,12 +5337,12 @@ func NewSecurityDefinitionsItem(in interface{}, context *compiler.Context) (*Sec
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matching_error := NewOauth2ImplicitSecurity(m, compiler.NewContext("oauth2ImplicitSecurity", context))
-			if matching_error == nil {
+			t, matchingError := NewOauth2ImplicitSecurity(m, compiler.NewContext("oauth2ImplicitSecurity", context))
+			if matchingError == nil {
 				x.Oneof = &SecurityDefinitionsItem_Oauth2ImplicitSecurity{Oauth2ImplicitSecurity: t}
 				matched = true
 			} else {
-				errors = append(errors, matching_error)
+				errors = append(errors, matchingError)
 			}
 		}
 	}
@@ -5295,12 +5351,12 @@ func NewSecurityDefinitionsItem(in interface{}, context *compiler.Context) (*Sec
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matching_error := NewOauth2PasswordSecurity(m, compiler.NewContext("oauth2PasswordSecurity", context))
-			if matching_error == nil {
+			t, matchingError := NewOauth2PasswordSecurity(m, compiler.NewContext("oauth2PasswordSecurity", context))
+			if matchingError == nil {
 				x.Oneof = &SecurityDefinitionsItem_Oauth2PasswordSecurity{Oauth2PasswordSecurity: t}
 				matched = true
 			} else {
-				errors = append(errors, matching_error)
+				errors = append(errors, matchingError)
 			}
 		}
 	}
@@ -5309,12 +5365,12 @@ func NewSecurityDefinitionsItem(in interface{}, context *compiler.Context) (*Sec
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matching_error := NewOauth2ApplicationSecurity(m, compiler.NewContext("oauth2ApplicationSecurity", context))
-			if matching_error == nil {
+			t, matchingError := NewOauth2ApplicationSecurity(m, compiler.NewContext("oauth2ApplicationSecurity", context))
+			if matchingError == nil {
 				x.Oneof = &SecurityDefinitionsItem_Oauth2ApplicationSecurity{Oauth2ApplicationSecurity: t}
 				matched = true
 			} else {
-				errors = append(errors, matching_error)
+				errors = append(errors, matchingError)
 			}
 		}
 	}
@@ -5323,12 +5379,12 @@ func NewSecurityDefinitionsItem(in interface{}, context *compiler.Context) (*Sec
 		m, ok := compiler.UnpackMap(in)
 		if ok {
 			// errors might be ok here, they mean we just don't have the right subtype
-			t, matching_error := NewOauth2AccessCodeSecurity(m, compiler.NewContext("oauth2AccessCodeSecurity", context))
-			if matching_error == nil {
+			t, matchingError := NewOauth2AccessCodeSecurity(m, compiler.NewContext("oauth2AccessCodeSecurity", context))
+			if matchingError == nil {
 				x.Oneof = &SecurityDefinitionsItem_Oauth2AccessCodeSecurity{Oauth2AccessCodeSecurity: t}
 				matched = true
 			} else {
-				errors = append(errors, matching_error)
+				errors = append(errors, matchingError)
 			}
 		}
 	}
@@ -5339,6 +5395,7 @@ func NewSecurityDefinitionsItem(in interface{}, context *compiler.Context) (*Sec
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewSecurityRequirement creates an object of type SecurityRequirement if possible, returning an error if not.
 func NewSecurityRequirement(in interface{}, context *compiler.Context) (*SecurityRequirement, error) {
 	errors := make([]error, 0)
 	x := &SecurityRequirement{}
@@ -5368,6 +5425,7 @@ func NewSecurityRequirement(in interface{}, context *compiler.Context) (*Securit
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewStringArray creates an object of type StringArray if possible, returning an error if not.
 func NewStringArray(in interface{}, context *compiler.Context) (*StringArray, error) {
 	errors := make([]error, 0)
 	x := &StringArray{}
@@ -5384,6 +5442,7 @@ func NewStringArray(in interface{}, context *compiler.Context) (*StringArray, er
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewTag creates an object of type Tag if possible, returning an error if not.
 func NewTag(in interface{}, context *compiler.Context) (*Tag, error) {
 	errors := make([]error, 0)
 	x := &Tag{}
@@ -5399,7 +5458,7 @@ func NewTag(in interface{}, context *compiler.Context) (*Tag, error) {
 			errors = append(errors, compiler.NewError(context, message))
 		}
 		allowedKeys := []string{"description", "externalDocs", "name"}
-		allowedPatterns := []string{"^x-"}
+		allowedPatterns := []*regexp.Regexp{pattern0}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
@@ -5439,7 +5498,7 @@ func NewTag(in interface{}, context *compiler.Context) (*Tag, error) {
 			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
-				if compiler.PatternMatches("^x-", k) {
+				if strings.HasPrefix(k, "x-") {
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
@@ -5467,6 +5526,7 @@ func NewTag(in interface{}, context *compiler.Context) (*Tag, error) {
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewTypeItem creates an object of type TypeItem if possible, returning an error if not.
 func NewTypeItem(in interface{}, context *compiler.Context) (*TypeItem, error) {
 	errors := make([]error, 0)
 	x := &TypeItem{}
@@ -5492,6 +5552,7 @@ func NewTypeItem(in interface{}, context *compiler.Context) (*TypeItem, error) {
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewVendorExtension creates an object of type VendorExtension if possible, returning an error if not.
 func NewVendorExtension(in interface{}, context *compiler.Context) (*VendorExtension, error) {
 	errors := make([]error, 0)
 	x := &VendorExtension{}
@@ -5533,6 +5594,7 @@ func NewVendorExtension(in interface{}, context *compiler.Context) (*VendorExten
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// NewXml creates an object of type Xml if possible, returning an error if not.
 func NewXml(in interface{}, context *compiler.Context) (*Xml, error) {
 	errors := make([]error, 0)
 	x := &Xml{}
@@ -5542,7 +5604,7 @@ func NewXml(in interface{}, context *compiler.Context) (*Xml, error) {
 		errors = append(errors, compiler.NewError(context, message))
 	} else {
 		allowedKeys := []string{"attribute", "name", "namespace", "prefix", "wrapped"}
-		allowedPatterns := []string{"^x-"}
+		allowedPatterns := []*regexp.Regexp{pattern0}
 		invalidKeys := compiler.InvalidKeysInMap(m, allowedKeys, allowedPatterns)
 		if len(invalidKeys) > 0 {
 			message := fmt.Sprintf("has invalid %s: %+v", compiler.PluralProperties(len(invalidKeys)), strings.Join(invalidKeys, ", "))
@@ -5600,7 +5662,7 @@ func NewXml(in interface{}, context *compiler.Context) (*Xml, error) {
 			k, ok := compiler.StringValue(item.Key)
 			if ok {
 				v := item.Value
-				if compiler.PatternMatches("^x-", k) {
+				if strings.HasPrefix(k, "x-") {
 					pair := &NamedAny{}
 					pair.Name = k
 					result := &Any{}
@@ -5628,6 +5690,7 @@ func NewXml(in interface{}, context *compiler.Context) (*Xml, error) {
 	return x, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside AdditionalPropertiesItem objects.
 func (m *AdditionalPropertiesItem) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	{
@@ -5642,11 +5705,13 @@ func (m *AdditionalPropertiesItem) ResolveReferences(root string) (interface{}, 
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Any objects.
 func (m *Any) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside ApiKeySecurity objects.
 func (m *ApiKeySecurity) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.VendorExtension {
@@ -5660,6 +5725,7 @@ func (m *ApiKeySecurity) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside BasicAuthenticationSecurity objects.
 func (m *BasicAuthenticationSecurity) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.VendorExtension {
@@ -5673,6 +5739,7 @@ func (m *BasicAuthenticationSecurity) ResolveReferences(root string) (interface{
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside BodyParameter objects.
 func (m *BodyParameter) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Schema != nil {
@@ -5692,6 +5759,7 @@ func (m *BodyParameter) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Contact objects.
 func (m *Contact) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.VendorExtension {
@@ -5705,6 +5773,7 @@ func (m *Contact) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Default objects.
 func (m *Default) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
@@ -5718,6 +5787,7 @@ func (m *Default) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Definitions objects.
 func (m *Definitions) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
@@ -5731,6 +5801,7 @@ func (m *Definitions) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Document objects.
 func (m *Document) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Info != nil {
@@ -5802,6 +5873,7 @@ func (m *Document) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Examples objects.
 func (m *Examples) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
@@ -5815,6 +5887,7 @@ func (m *Examples) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside ExternalDocs objects.
 func (m *ExternalDocs) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.VendorExtension {
@@ -5828,6 +5901,7 @@ func (m *ExternalDocs) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside FileSchema objects.
 func (m *FileSchema) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Default != nil {
@@ -5859,6 +5933,7 @@ func (m *FileSchema) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside FormDataParameterSubSchema objects.
 func (m *FormDataParameterSubSchema) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Items != nil {
@@ -5892,6 +5967,7 @@ func (m *FormDataParameterSubSchema) ResolveReferences(root string) (interface{}
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Header objects.
 func (m *Header) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Items != nil {
@@ -5925,6 +6001,7 @@ func (m *Header) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside HeaderParameterSubSchema objects.
 func (m *HeaderParameterSubSchema) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Items != nil {
@@ -5958,6 +6035,7 @@ func (m *HeaderParameterSubSchema) ResolveReferences(root string) (interface{}, 
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Headers objects.
 func (m *Headers) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
@@ -5971,6 +6049,7 @@ func (m *Headers) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Info objects.
 func (m *Info) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Contact != nil {
@@ -5996,6 +6075,7 @@ func (m *Info) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside ItemsItem objects.
 func (m *ItemsItem) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.Schema {
@@ -6009,6 +6089,7 @@ func (m *ItemsItem) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside JsonReference objects.
 func (m *JsonReference) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.XRef != "" {
@@ -6028,6 +6109,7 @@ func (m *JsonReference) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside License objects.
 func (m *License) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.VendorExtension {
@@ -6041,6 +6123,7 @@ func (m *License) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside NamedAny objects.
 func (m *NamedAny) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
@@ -6052,6 +6135,7 @@ func (m *NamedAny) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside NamedHeader objects.
 func (m *NamedHeader) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
@@ -6063,6 +6147,7 @@ func (m *NamedHeader) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside NamedParameter objects.
 func (m *NamedParameter) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
@@ -6074,6 +6159,7 @@ func (m *NamedParameter) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside NamedPathItem objects.
 func (m *NamedPathItem) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
@@ -6085,6 +6171,7 @@ func (m *NamedPathItem) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside NamedResponse objects.
 func (m *NamedResponse) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
@@ -6096,6 +6183,7 @@ func (m *NamedResponse) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside NamedResponseValue objects.
 func (m *NamedResponseValue) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
@@ -6107,6 +6195,7 @@ func (m *NamedResponseValue) ResolveReferences(root string) (interface{}, error)
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside NamedSchema objects.
 func (m *NamedSchema) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
@@ -6118,6 +6207,7 @@ func (m *NamedSchema) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside NamedSecurityDefinitionsItem objects.
 func (m *NamedSecurityDefinitionsItem) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
@@ -6129,11 +6219,13 @@ func (m *NamedSecurityDefinitionsItem) ResolveReferences(root string) (interface
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside NamedString objects.
 func (m *NamedString) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside NamedStringArray objects.
 func (m *NamedStringArray) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Value != nil {
@@ -6145,6 +6237,7 @@ func (m *NamedStringArray) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside NonBodyParameter objects.
 func (m *NonBodyParameter) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	{
@@ -6186,6 +6279,7 @@ func (m *NonBodyParameter) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Oauth2AccessCodeSecurity objects.
 func (m *Oauth2AccessCodeSecurity) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Scopes != nil {
@@ -6205,6 +6299,7 @@ func (m *Oauth2AccessCodeSecurity) ResolveReferences(root string) (interface{}, 
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Oauth2ApplicationSecurity objects.
 func (m *Oauth2ApplicationSecurity) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Scopes != nil {
@@ -6224,6 +6319,7 @@ func (m *Oauth2ApplicationSecurity) ResolveReferences(root string) (interface{},
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Oauth2ImplicitSecurity objects.
 func (m *Oauth2ImplicitSecurity) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Scopes != nil {
@@ -6243,6 +6339,7 @@ func (m *Oauth2ImplicitSecurity) ResolveReferences(root string) (interface{}, er
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Oauth2PasswordSecurity objects.
 func (m *Oauth2PasswordSecurity) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Scopes != nil {
@@ -6262,6 +6359,7 @@ func (m *Oauth2PasswordSecurity) ResolveReferences(root string) (interface{}, er
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Oauth2Scopes objects.
 func (m *Oauth2Scopes) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
@@ -6275,6 +6373,7 @@ func (m *Oauth2Scopes) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Operation objects.
 func (m *Operation) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.ExternalDocs != nil {
@@ -6316,6 +6415,7 @@ func (m *Operation) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Parameter objects.
 func (m *Parameter) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	{
@@ -6339,6 +6439,7 @@ func (m *Parameter) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside ParameterDefinitions objects.
 func (m *ParameterDefinitions) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
@@ -6352,6 +6453,7 @@ func (m *ParameterDefinitions) ResolveReferences(root string) (interface{}, erro
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside ParametersItem objects.
 func (m *ParametersItem) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	{
@@ -6383,6 +6485,7 @@ func (m *ParametersItem) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside PathItem objects.
 func (m *PathItem) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.XRef != "" {
@@ -6460,6 +6563,7 @@ func (m *PathItem) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside PathParameterSubSchema objects.
 func (m *PathParameterSubSchema) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Items != nil {
@@ -6493,6 +6597,7 @@ func (m *PathParameterSubSchema) ResolveReferences(root string) (interface{}, er
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Paths objects.
 func (m *Paths) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.VendorExtension {
@@ -6514,6 +6619,7 @@ func (m *Paths) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside PrimitivesItems objects.
 func (m *PrimitivesItems) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Items != nil {
@@ -6547,6 +6653,7 @@ func (m *PrimitivesItems) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Properties objects.
 func (m *Properties) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
@@ -6560,6 +6667,7 @@ func (m *Properties) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside QueryParameterSubSchema objects.
 func (m *QueryParameterSubSchema) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Items != nil {
@@ -6593,6 +6701,7 @@ func (m *QueryParameterSubSchema) ResolveReferences(root string) (interface{}, e
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Response objects.
 func (m *Response) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.Schema != nil {
@@ -6624,6 +6733,7 @@ func (m *Response) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside ResponseDefinitions objects.
 func (m *ResponseDefinitions) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
@@ -6637,6 +6747,7 @@ func (m *ResponseDefinitions) ResolveReferences(root string) (interface{}, error
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside ResponseValue objects.
 func (m *ResponseValue) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	{
@@ -6668,6 +6779,7 @@ func (m *ResponseValue) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Responses objects.
 func (m *Responses) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.ResponseCode {
@@ -6689,6 +6801,7 @@ func (m *Responses) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Schema objects.
 func (m *Schema) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.XRef != "" {
@@ -6780,6 +6893,7 @@ func (m *Schema) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside SchemaItem objects.
 func (m *SchemaItem) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	{
@@ -6803,6 +6917,7 @@ func (m *SchemaItem) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside SecurityDefinitions objects.
 func (m *SecurityDefinitions) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
@@ -6816,6 +6931,7 @@ func (m *SecurityDefinitions) ResolveReferences(root string) (interface{}, error
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside SecurityDefinitionsItem objects.
 func (m *SecurityDefinitionsItem) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	{
@@ -6875,6 +6991,7 @@ func (m *SecurityDefinitionsItem) ResolveReferences(root string) (interface{}, e
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside SecurityRequirement objects.
 func (m *SecurityRequirement) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
@@ -6888,11 +7005,13 @@ func (m *SecurityRequirement) ResolveReferences(root string) (interface{}, error
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside StringArray objects.
 func (m *StringArray) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Tag objects.
 func (m *Tag) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	if m.ExternalDocs != nil {
@@ -6912,11 +7031,13 @@ func (m *Tag) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside TypeItem objects.
 func (m *TypeItem) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside VendorExtension objects.
 func (m *VendorExtension) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.AdditionalProperties {
@@ -6930,6 +7051,7 @@ func (m *VendorExtension) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ResolveReferences resolves references found inside Xml objects.
 func (m *Xml) ResolveReferences(root string) (interface{}, error) {
 	errors := make([]error, 0)
 	for _, item := range m.VendorExtension {
@@ -6943,6 +7065,7 @@ func (m *Xml) ResolveReferences(root string) (interface{}, error) {
 	return nil, compiler.NewErrorGroupOrNil(errors)
 }
 
+// ToRawInfo returns a description of AdditionalPropertiesItem suitable for JSON or YAML export.
 func (m *AdditionalPropertiesItem) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
 	// AdditionalPropertiesItem
@@ -6958,6 +7081,7 @@ func (m *AdditionalPropertiesItem) ToRawInfo() interface{} {
 	return nil
 }
 
+// ToRawInfo returns a description of Any suitable for JSON or YAML export.
 func (m *Any) ToRawInfo() interface{} {
 	var err error
 	var info1 []yaml.MapSlice
@@ -6978,6 +7102,7 @@ func (m *Any) ToRawInfo() interface{} {
 	return nil
 }
 
+// ToRawInfo returns a description of ApiKeySecurity suitable for JSON or YAML export.
 func (m *ApiKeySecurity) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Type != "" {
@@ -7001,6 +7126,7 @@ func (m *ApiKeySecurity) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of BasicAuthenticationSecurity suitable for JSON or YAML export.
 func (m *BasicAuthenticationSecurity) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Type != "" {
@@ -7018,6 +7144,7 @@ func (m *BasicAuthenticationSecurity) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of BodyParameter suitable for JSON or YAML export.
 func (m *BodyParameter) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Description != "" {
@@ -7045,6 +7172,7 @@ func (m *BodyParameter) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of Contact suitable for JSON or YAML export.
 func (m *Contact) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Name != "" {
@@ -7065,6 +7193,7 @@ func (m *Contact) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of Default suitable for JSON or YAML export.
 func (m *Default) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.AdditionalProperties != nil {
@@ -7076,6 +7205,7 @@ func (m *Default) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of Definitions suitable for JSON or YAML export.
 func (m *Definitions) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.AdditionalProperties != nil {
@@ -7087,6 +7217,7 @@ func (m *Definitions) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of Document suitable for JSON or YAML export.
 func (m *Document) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Swagger != "" {
@@ -7160,6 +7291,7 @@ func (m *Document) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of Examples suitable for JSON or YAML export.
 func (m *Examples) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.AdditionalProperties != nil {
@@ -7171,6 +7303,7 @@ func (m *Examples) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of ExternalDocs suitable for JSON or YAML export.
 func (m *ExternalDocs) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Description != "" {
@@ -7188,6 +7321,7 @@ func (m *ExternalDocs) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of FileSchema suitable for JSON or YAML export.
 func (m *FileSchema) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Format != "" {
@@ -7229,6 +7363,7 @@ func (m *FileSchema) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of FormDataParameterSubSchema suitable for JSON or YAML export.
 func (m *FormDataParameterSubSchema) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Required != false {
@@ -7313,6 +7448,7 @@ func (m *FormDataParameterSubSchema) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of Header suitable for JSON or YAML export.
 func (m *Header) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Type != "" {
@@ -7385,6 +7521,7 @@ func (m *Header) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of HeaderParameterSubSchema suitable for JSON or YAML export.
 func (m *HeaderParameterSubSchema) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Required != false {
@@ -7466,6 +7603,7 @@ func (m *HeaderParameterSubSchema) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of Headers suitable for JSON or YAML export.
 func (m *Headers) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.AdditionalProperties != nil {
@@ -7477,6 +7615,7 @@ func (m *Headers) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of Info suitable for JSON or YAML export.
 func (m *Info) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Title != "" {
@@ -7508,6 +7647,7 @@ func (m *Info) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of ItemsItem suitable for JSON or YAML export.
 func (m *ItemsItem) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if len(m.Schema) != 0 {
@@ -7521,6 +7661,7 @@ func (m *ItemsItem) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of JsonReference suitable for JSON or YAML export.
 func (m *JsonReference) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.XRef != "" {
@@ -7532,6 +7673,7 @@ func (m *JsonReference) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of License suitable for JSON or YAML export.
 func (m *License) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Name != "" {
@@ -7549,6 +7691,7 @@ func (m *License) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of NamedAny suitable for JSON or YAML export.
 func (m *NamedAny) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Name != "" {
@@ -7558,6 +7701,7 @@ func (m *NamedAny) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of NamedHeader suitable for JSON or YAML export.
 func (m *NamedHeader) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Name != "" {
@@ -7567,6 +7711,7 @@ func (m *NamedHeader) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of NamedParameter suitable for JSON or YAML export.
 func (m *NamedParameter) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Name != "" {
@@ -7576,6 +7721,7 @@ func (m *NamedParameter) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of NamedPathItem suitable for JSON or YAML export.
 func (m *NamedPathItem) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Name != "" {
@@ -7585,6 +7731,7 @@ func (m *NamedPathItem) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of NamedResponse suitable for JSON or YAML export.
 func (m *NamedResponse) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Name != "" {
@@ -7594,6 +7741,7 @@ func (m *NamedResponse) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of NamedResponseValue suitable for JSON or YAML export.
 func (m *NamedResponseValue) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Name != "" {
@@ -7603,6 +7751,7 @@ func (m *NamedResponseValue) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of NamedSchema suitable for JSON or YAML export.
 func (m *NamedSchema) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Name != "" {
@@ -7612,6 +7761,7 @@ func (m *NamedSchema) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of NamedSecurityDefinitionsItem suitable for JSON or YAML export.
 func (m *NamedSecurityDefinitionsItem) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Name != "" {
@@ -7621,6 +7771,7 @@ func (m *NamedSecurityDefinitionsItem) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of NamedString suitable for JSON or YAML export.
 func (m *NamedString) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Name != "" {
@@ -7632,6 +7783,7 @@ func (m *NamedString) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of NamedStringArray suitable for JSON or YAML export.
 func (m *NamedStringArray) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Name != "" {
@@ -7641,6 +7793,7 @@ func (m *NamedStringArray) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of NonBodyParameter suitable for JSON or YAML export.
 func (m *NonBodyParameter) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
 	// NonBodyParameter
@@ -7667,6 +7820,7 @@ func (m *NonBodyParameter) ToRawInfo() interface{} {
 	return nil
 }
 
+// ToRawInfo returns a description of Oauth2AccessCodeSecurity suitable for JSON or YAML export.
 func (m *Oauth2AccessCodeSecurity) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Type != "" {
@@ -7697,6 +7851,7 @@ func (m *Oauth2AccessCodeSecurity) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of Oauth2ApplicationSecurity suitable for JSON or YAML export.
 func (m *Oauth2ApplicationSecurity) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Type != "" {
@@ -7724,6 +7879,7 @@ func (m *Oauth2ApplicationSecurity) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of Oauth2ImplicitSecurity suitable for JSON or YAML export.
 func (m *Oauth2ImplicitSecurity) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Type != "" {
@@ -7751,6 +7907,7 @@ func (m *Oauth2ImplicitSecurity) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of Oauth2PasswordSecurity suitable for JSON or YAML export.
 func (m *Oauth2PasswordSecurity) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Type != "" {
@@ -7778,12 +7935,14 @@ func (m *Oauth2PasswordSecurity) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of Oauth2Scopes suitable for JSON or YAML export.
 func (m *Oauth2Scopes) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	// &{Name:additionalProperties Type:NamedString StringEnumValues:[] MapType:string Repeated:true Pattern: Implicit:true Description:}
 	return info
 }
 
+// ToRawInfo returns a description of Operation suitable for JSON or YAML export.
 func (m *Operation) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if len(m.Tags) != 0 {
@@ -7843,6 +8002,7 @@ func (m *Operation) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of Parameter suitable for JSON or YAML export.
 func (m *Parameter) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
 	// Parameter
@@ -7859,6 +8019,7 @@ func (m *Parameter) ToRawInfo() interface{} {
 	return nil
 }
 
+// ToRawInfo returns a description of ParameterDefinitions suitable for JSON or YAML export.
 func (m *ParameterDefinitions) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.AdditionalProperties != nil {
@@ -7870,6 +8031,7 @@ func (m *ParameterDefinitions) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of ParametersItem suitable for JSON or YAML export.
 func (m *ParametersItem) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
 	// ParametersItem
@@ -7886,6 +8048,7 @@ func (m *ParametersItem) ToRawInfo() interface{} {
 	return nil
 }
 
+// ToRawInfo returns a description of PathItem suitable for JSON or YAML export.
 func (m *PathItem) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.XRef != "" {
@@ -7936,6 +8099,7 @@ func (m *PathItem) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of PathParameterSubSchema suitable for JSON or YAML export.
 func (m *PathParameterSubSchema) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Required != false {
@@ -8017,6 +8181,7 @@ func (m *PathParameterSubSchema) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of Paths suitable for JSON or YAML export.
 func (m *Paths) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.VendorExtension != nil {
@@ -8034,6 +8199,7 @@ func (m *Paths) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of PrimitivesItems suitable for JSON or YAML export.
 func (m *PrimitivesItems) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Type != "" {
@@ -8103,6 +8269,7 @@ func (m *PrimitivesItems) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of Properties suitable for JSON or YAML export.
 func (m *Properties) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.AdditionalProperties != nil {
@@ -8114,6 +8281,7 @@ func (m *Properties) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of QueryParameterSubSchema suitable for JSON or YAML export.
 func (m *QueryParameterSubSchema) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Required != false {
@@ -8198,6 +8366,7 @@ func (m *QueryParameterSubSchema) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of Response suitable for JSON or YAML export.
 func (m *Response) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Description != "" {
@@ -8224,6 +8393,7 @@ func (m *Response) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of ResponseDefinitions suitable for JSON or YAML export.
 func (m *ResponseDefinitions) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.AdditionalProperties != nil {
@@ -8235,6 +8405,7 @@ func (m *ResponseDefinitions) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of ResponseValue suitable for JSON or YAML export.
 func (m *ResponseValue) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
 	// ResponseValue
@@ -8251,6 +8422,7 @@ func (m *ResponseValue) ToRawInfo() interface{} {
 	return nil
 }
 
+// ToRawInfo returns a description of Responses suitable for JSON or YAML export.
 func (m *Responses) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.ResponseCode != nil {
@@ -8268,6 +8440,7 @@ func (m *Responses) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of Schema suitable for JSON or YAML export.
 func (m *Schema) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.XRef != "" {
@@ -8395,6 +8568,7 @@ func (m *Schema) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of SchemaItem suitable for JSON or YAML export.
 func (m *SchemaItem) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
 	// SchemaItem
@@ -8411,6 +8585,7 @@ func (m *SchemaItem) ToRawInfo() interface{} {
 	return nil
 }
 
+// ToRawInfo returns a description of SecurityDefinitions suitable for JSON or YAML export.
 func (m *SecurityDefinitions) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.AdditionalProperties != nil {
@@ -8422,6 +8597,7 @@ func (m *SecurityDefinitions) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of SecurityDefinitionsItem suitable for JSON or YAML export.
 func (m *SecurityDefinitionsItem) ToRawInfo() interface{} {
 	// ONE OF WRAPPER
 	// SecurityDefinitionsItem
@@ -8458,6 +8634,7 @@ func (m *SecurityDefinitionsItem) ToRawInfo() interface{} {
 	return nil
 }
 
+// ToRawInfo returns a description of SecurityRequirement suitable for JSON or YAML export.
 func (m *SecurityRequirement) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.AdditionalProperties != nil {
@@ -8469,10 +8646,12 @@ func (m *SecurityRequirement) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of StringArray suitable for JSON or YAML export.
 func (m *StringArray) ToRawInfo() interface{} {
 	return m.Value
 }
 
+// ToRawInfo returns a description of Tag suitable for JSON or YAML export.
 func (m *Tag) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Name != "" {
@@ -8494,6 +8673,7 @@ func (m *Tag) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of TypeItem suitable for JSON or YAML export.
 func (m *TypeItem) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if len(m.Value) != 0 {
@@ -8502,6 +8682,7 @@ func (m *TypeItem) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of VendorExtension suitable for JSON or YAML export.
 func (m *VendorExtension) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.AdditionalProperties != nil {
@@ -8513,6 +8694,7 @@ func (m *VendorExtension) ToRawInfo() interface{} {
 	return info
 }
 
+// ToRawInfo returns a description of Xml suitable for JSON or YAML export.
 func (m *Xml) ToRawInfo() interface{} {
 	info := yaml.MapSlice{}
 	if m.Name != "" {
@@ -8538,3 +8720,9 @@ func (m *Xml) ToRawInfo() interface{} {
 	// &{Name:VendorExtension Type:NamedAny StringEnumValues:[] MapType:Any Repeated:true Pattern:^x- Implicit:true Description:}
 	return info
 }
+
+var (
+	pattern0 = regexp.MustCompile("^x-")
+	pattern1 = regexp.MustCompile("^/")
+	pattern2 = regexp.MustCompile("^([0-9]{3})$|^(default)$")
+)
