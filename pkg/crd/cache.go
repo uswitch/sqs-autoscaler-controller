@@ -4,13 +4,14 @@ import (
 	"context"
 	"time"
 
-	log "github.com/Sirupsen/logrus"
 	metrics "github.com/rcrowley/go-metrics"
+	log "github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
 )
 
+//Cache ....
 type Cache struct {
 	Store      cache.Indexer
 	controller cache.Controller
@@ -37,10 +38,12 @@ func (c Cache) process(obj interface{}) error {
 	return nil
 }
 
+//Run ....
 func (c Cache) Run(ctx context.Context) {
 	c.controller.Run(ctx.Done())
 }
 
+//NewCache ....
 func NewCache(client *rest.RESTClient, syncInterval time.Duration) *Cache {
 	c := &Cache{}
 
@@ -48,7 +51,7 @@ func NewCache(client *rest.RESTClient, syncInterval time.Duration) *Cache {
 	store := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
 	c.Store = store
 	config := &cache.Config{
-		Queue:            cache.NewDeltaFIFO(cache.MetaNamespaceKeyFunc, nil, store),
+		Queue:            cache.NewDeltaFIFO(cache.MetaNamespaceKeyFunc, store),
 		ListerWatcher:    listWatch,
 		ObjectType:       &SqsAutoScaler{},
 		FullResyncPeriod: syncInterval,

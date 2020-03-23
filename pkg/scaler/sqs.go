@@ -9,10 +9,11 @@ import (
 	"github.com/aws/aws-sdk-go/service/sqs"
 )
 
-func CurrentQueueSize(sess *session.Session, queueUrl string) (int64, error) {
+//CurrentQueueSize ....
+func CurrentQueueSize(sess *session.Session, queueURL string) (int64, error) {
 	svc := sqs.New(sess)
 	output, err := svc.GetQueueAttributes(&sqs.GetQueueAttributesInput{
-		QueueUrl:       &queueUrl,
+		QueueUrl:       &queueURL,
 		AttributeNames: []*string{aws.String("ApproximateNumberOfMessages")},
 	})
 	if err != nil {

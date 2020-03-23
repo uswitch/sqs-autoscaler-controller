@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"time"
 
-	log "github.com/Sirupsen/logrus"
+	"sqs-autoscaler-controller/pkg/crd"
+
 	"github.com/rcrowley/go-metrics"
-	"github.com/uswitch/sqs-autoscaler-controller/pkg/crd"
+	log "github.com/sirupsen/logrus"
 	"github.com/vmg/backoff"
-	appsv1 "k8s.io/api/apps/v1beta1"
+	appsv1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
@@ -17,16 +18,19 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 )
 
+//Scaler ....
 type Scaler struct {
 	client   *kubernetes.Clientset
 	store    cache.Store
 	interval time.Duration
 }
 
+//New ....
 func New(client *kubernetes.Clientset, store cache.Store, interval time.Duration) *Scaler {
 	return &Scaler{client, store, interval}
 }
 
+//Run ....
 func (s Scaler) Run(ctx context.Context) error {
 	ticker := time.NewTicker(s.interval)
 	sess, err := session.NewSession()
@@ -82,7 +86,7 @@ func (s Scaler) executeScale(ctx context.Context, sess *session.Session, scale *
 		return nil, 0, err
 	}
 
-	deployments := s.client.Apps().Deployments(scale.ObjectMeta.Namespace)
+	deployments := s.client.AppsV1().Deployments(scale.ObjectMeta.Namespace)
 	deployment, err := deployments.Get(scale.Spec.Deployment, metav1.GetOptions{})
 	if err != nil {
 		return nil, 0, err
@@ -108,6 +112,7 @@ func (s Scaler) executeScale(ctx context.Context, sess *session.Session, scale *
 	return updated, delta, err
 }
 
+//Constant ....
 const (
 	ReasonScaleDeployment       = "ScaleSuccess"
 	ReasonFailedScaleDeployment = "ScaleFail"

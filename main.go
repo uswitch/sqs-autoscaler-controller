@@ -7,17 +7,18 @@ import (
 	"os/signal"
 	"time"
 
-	log "github.com/Sirupsen/logrus"
-	"github.com/pubnub/go-metrics-statsd"
+	statsd "github.com/pubnub/go-metrics-statsd"
 	"github.com/rcrowley/go-metrics"
+	log "github.com/sirupsen/logrus"
 	"gopkg.in/alecthomas/kingpin.v2"
 	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	"k8s.io/client-go/kubernetes"
+	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 
-	"github.com/uswitch/sqs-autoscaler-controller/pkg/crd"
-	"github.com/uswitch/sqs-autoscaler-controller/pkg/scaler"
+	"sqs-autoscaler-controller/pkg/crd"
+	"sqs-autoscaler-controller/pkg/scaler"
 )
 
 type options struct {
@@ -44,7 +45,7 @@ func createClient(config *rest.Config) (*kubernetes.Clientset, error) {
 	return c, nil
 }
 
-func createApiExtensionsClient(config *rest.Config) (apiextensionsclient.Interface, error) {
+func createAPIExtensionsClient(config *rest.Config) (apiextensionsclient.Interface, error) {
 	c, err := apiextensionsclient.NewForConfig(config)
 	if err != nil {
 		return nil, err
@@ -91,7 +92,7 @@ func main() {
 		log.Fatalf("error creating client: %s", err)
 	}
 
-	aec, err := createApiExtensionsClient(config)
+	aec, err := createAPIExtensionsClient(config)
 	if err != nil {
 		log.Fatalf("error creating apiExtensionsClient: %s", err)
 	}
