@@ -1,8 +1,10 @@
 kind: Deployment
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 metadata:
   name: sqs-autoscaler-controller
   namespace: kube-system
+  labels:
+    app: sqs-autoscaler-controller
 spec:
   replicas: 1
   template:
@@ -12,10 +14,16 @@ spec:
       annotations:
         iam.amazonaws.com/role: cloud_sqs_autoscaler
     spec:
-      volumes:
-        - name: ssl-certs
-          hostPath:
-            path: /usr/share/ca-certificates
+      progressDeadlineSeconds: 600
+      revisionHistoryLimit: 2
+      selector:
+        matchLabels:
+          name: sqs-autoscaler-controller
+      strategy:
+        rollingUpdate:
+          maxSurge: 25%
+          maxUnavailable: 25%
+        type: RollingUpdate
       containers:
       - image: quay.io/uswitch/sqs-autoscaler-controller:master
         imagePullPolicy: Always
@@ -32,3 +40,16 @@ spec:
         volumeMounts:
         - mountPath: /etc/ssl/certs
           name: ssl-certs
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: sqs-autoscaler-controller
+      serviceAccountName: sqs-autoscaler-controller
+      terminationGracePeriodSeconds: 60
+      volumes:
+      - hostPath:
+          path: /usr/share/ca-certificates
+          type: ""
+        name: ssl-certs
+        

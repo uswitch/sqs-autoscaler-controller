@@ -3,16 +3,18 @@ package crd
 import (
 	"time"
 
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 )
 
+//Constant ....
 const (
 	TypeNormal  = "Normal"
 	TypeWarning = "Warning"
 )
 
+//RecordEvent ...
 func (s *SqsAutoScaler) RecordEvent(k *kubernetes.Clientset, eventType, reason, message string) error {
 	now := metav1.NewTime(time.Now())
 	event := &v1.Event{
