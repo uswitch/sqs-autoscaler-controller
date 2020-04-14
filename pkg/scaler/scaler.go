@@ -21,10 +21,11 @@ type Scaler struct {
 	client   *kubernetes.Clientset
 	store    cache.Store
 	interval time.Duration
+	delay    time.Duration
 }
 
-func New(client *kubernetes.Clientset, store cache.Store, interval time.Duration) *Scaler {
-	return &Scaler{client, store, interval}
+func New(client *kubernetes.Clientset, store cache.Store, interval time.Duration, delay time.Duration) *Scaler {
+	return &Scaler{client, store, interval, delay}
 }
 
 func (s Scaler) Run(ctx context.Context) error {
@@ -70,6 +71,7 @@ func (s Scaler) targetReplicas(size int64, scale *crd.SqsAutoScaler, d *appsv1.D
 		desired := replicas + scale.Spec.ScaleUp.Amount
 		return min(desired, scale.Spec.MaxPods), nil
 	} else if size <= scale.Spec.ScaleDown.Threshold {
+		time.Sleep(s.delay * time.Second)
 		desired := replicas - scale.Spec.ScaleDown.Amount
 		return max(desired, scale.Spec.MinPods), nil
 	}
