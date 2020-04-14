@@ -25,6 +25,7 @@ type options struct {
 	kubeconfig     string
 	syncInterval   time.Duration
 	scaleInterval  time.Duration
+	scaleDownDelay time.Duration
 	statsD         string
 	statsDInterval time.Duration
 }
@@ -58,7 +59,7 @@ func main() {
 	kingpin.Flag("kubeconfig", "Path to kubeconfig.").StringVar(&opts.kubeconfig)
 	kingpin.Flag("sync-interval", "Interval to periodically refresh Scaler objects from Kubernetes.").Default("1m").DurationVar(&opts.syncInterval)
 	kingpin.Flag("scale-interval", "Interval to check queue sizes and scale deployments.").Default("1m").DurationVar(&opts.scaleInterval)
-
+	kingpin.Flag("scaledown-delay", "Delay in scaling down the pods once the scale down threshold is met.").Default("1s").DurationVar(&opts.scaleDownDelay)
 	kingpin.Flag("statsd", "UDP address to publish StatsD metrics. e.g. 127.0.0.1:8125").Default("").StringVar(&opts.statsD)
 	kingpin.Flag("statsd-interval", "Interval to publish to StatsD").Default("10s").DurationVar(&opts.statsDInterval)
 
@@ -109,7 +110,7 @@ func main() {
 	cache := crd.NewCache(sc, opts.syncInterval)
 	go cache.Run(ctx)
 
-	s := scaler.New(cs, cache.Store, opts.scaleInterval)
+	s := scaler.New(cs, cache.Store, opts.scaleInterval, opts.scaleDownDelay)
 	go s.Run(ctx)
 
 	<-stopChan
